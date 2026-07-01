@@ -27,8 +27,6 @@ namespace module::core
         lua_setglobal(L, "shared");
 
         luaL_sandboxthread(L);
-
-        //module::rbx::g_task_scheduler.queue_execution("loadstring(game:HttpGet('https://raw.githubusercontent.com/beacache/executor/refs/heads/main/drawing.luau'))()");
     }
 
     void c_environment::reset()
