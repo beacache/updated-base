@@ -18,7 +18,7 @@ namespace module::core
         http.register_library(L);
         miscellaneous.register_library(L);
         scripts.register_library(L);
-        websocket.register_library(L);
+        //websocket.register_library(L);
 
         lua_newtable(L);
         lua_setglobal(L, "_G");
