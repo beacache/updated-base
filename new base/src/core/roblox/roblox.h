@@ -72,8 +72,8 @@ namespace module::update {
     };
 
     namespace data_model {
-        static auto place_id = offset_t<std::int64_t>(0x190);
-        static auto game_id = offset_t<std::int64_t>(0x188);
+        static auto place_id = offset_t<std::int64_t>(0x1a0); // was: 0x1a8
+        static auto game_id = offset_t<std::int64_t>(0x1a8);
         static auto game_loaded = offset_t<std::uintptr_t>(0x658);
         static auto script_context = offset_t<std::uintptr_t>(0x440);
         static auto fake_dm_to_real_dm = offset_t<std::uintptr_t>(0x1d0);
