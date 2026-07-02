@@ -231,7 +231,7 @@ namespace module::update {
     };
 
     namespace appdata {
-        using get_appdata_info_t = void*(__fastcall*)();
+        using get_appdata_info_t = uintptr_t(__fastcall*)();
 
         const auto get = rebase<get_appdata_info_t>(0x36b0310);
         const auto info = rebase<std::uintptr_t>(0x7ea3ed0);
