@@ -1,6 +1,7 @@
-version-1a951716f19e4638
+updated to __version-5cf2272675e145f5__
 
-7sunc(haven't test) 7unc
+# tests
+# 7 unc
+# ~7 sunc (didnt tested)
 
-
-server bridge is from yubx 
+# server bridge is from yubx 
