@@ -9,7 +9,7 @@ namespace module::rbx
     {
         __try
         {
-            return module::update::app_data::get_app_data_info();
+            return module::update::appdata::get();
         }
         __except (EXCEPTION_EXECUTE_HANDLER)
         {
@@ -21,11 +21,11 @@ namespace module::rbx
     {
         __try
         {
-            uintptr_t info = module::update::app_data::get_app_data_info();
+            uintptr_t info = module::update::appdata::get();
             if (!info)
                 return false;
 
-            status = module::update::app_data::app_status.get(info);
+            status = module::update::appdata::app_status.get(info);
             return true;
         }
         __except (EXCEPTION_EXECUTE_HANDLER)
