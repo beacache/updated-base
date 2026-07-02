@@ -275,7 +275,7 @@ struct lua_State
     bool isactive; //0x5
     bool singlestep; //0x6
     GCObject* gclist; //0x8
-    LSTATE_STACKSIZE_ENC<int> stacksize; //0x10
+    lstate_stacksize<int> stacksize; //0x10
     int size_ci; //0x14
     TString* namecall; //0x18
     unsigned short nCcalls; //0x20
