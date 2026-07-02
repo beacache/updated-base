@@ -13,17 +13,17 @@
     vmvalue4: data = (value - (data + offset)) || value = ((v + offset) + data)
 */
 
-#define proto_lineinfo     vmvalue1 // proto_lineinfo_enc
-#define proto_locvars      vmvalue4 // proto_locvars_enc
-#define proto_upvalues     vmvalue2 // proto_upvalues_enc
-#define proto_debuginsn    vmvalue4 // proto_debuginsn_enc
-#define proto_typeinfo     vmvalue3 // proto_typeinfo_enc
-#define proto_source       vmvalue1 // proto_source_enc
-#define proto_abslineinfo  vmvalue4 // proto_abslineinfo_enc
+#define proto_lineinfo     vmvalue2 // proto_lineinfo_enc
+#define proto_locvars      vmvalue3 // proto_locvars_enc
+#define proto_upvalues     vmvalue4 // proto_upvalues_enc
+#define proto_debuginsn    vmvalue2 // proto_debuginsn_enc
+#define proto_typeinfo     vmvalue1 // proto_typeinfo_enc
+#define proto_source       vmvalue3 // proto_source_enc
+#define proto_abslineinfo  vmvalue3 // proto_abslineinfo_enc
 #define proto_debugname    vmvalue4 // proto_debugname_enc
 #define proto_userdata     vmvalue1 // proto_userdata_enc
-#define udata_meta         vmvalue1 // udata_meta_enc
-#define closure_debugname  vmvalue4 // closure_debugname_enc
-#define closure_cont       vmvalue3 // closure_cont_enc
+#define udata_meta         vmvalue3 // udata_meta_enc
+#define closure_debugname  vmvalue2 // closure_debugname_enc
+#define closure_cont       vmvalue4 // closure_cont_enc
 #define tstring_hash       vmvalue1 // tstring_hash_enc
 #define lstate_stacksize   vmvalue3 // lstate_stacksize_enc
