@@ -21,7 +21,7 @@
 #define proto_source       vmvalue3 // proto_source_enc
 #define proto_abslineinfo  vmvalue3 // proto_abslineinfo_enc
 #define proto_debugname    vmvalue4 // proto_debugname_enc
-#define proto_userdata     vmvalue1 // proto_userdata_enc
+#define proto_userdata     vmvalue2 // proto_userdata_enc
 #define udata_meta         vmvalue3 // udata_meta_enc
 #define closure_debugname  vmvalue2 // closure_debugname_enc
 #define closure_cont       vmvalue4 // closure_cont_enc
