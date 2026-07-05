@@ -92,7 +92,7 @@ namespace module::rbx
 
     void g_task_scheduler_t::set_capabilities(lua_State* state, int level, uintptr_t capabilities)
     {
-        state->userdata->Identity.value = level;
-        state->userdata->Capabilities = capabilities;
+        state->userdata->identity = level;
+        state->userdata->capabilities = capabilities;
     }
 }

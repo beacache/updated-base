@@ -4,7 +4,7 @@ namespace module::core::environment
 {
     using namespace module::rbx;
 
-    int c_http::http_get(lua_State * L)
+    int c_http::http_get(lua_State* L)
     {
         std::string url;
 
@@ -95,7 +95,7 @@ namespace module::core::environment
         });
     }
 
-    int c_http::http_post(lua_State * L)
+    int c_http::http_post(lua_State* L)
     {
         std::string url;
         std::string body;
@@ -200,7 +200,7 @@ namespace module::core::environment
         });
     }
 
-    int c_http::request(lua_State * L)
+    int c_http::request(lua_State* L)
     {
         if (!lua_istable(L, 1))
         {
@@ -364,7 +364,7 @@ namespace module::core::environment
         });
     }
 
-    void c_http::register_library(lua_State * L)
+    void c_http::register_library(lua_State* L)
     {
         utils.add_function(L, "HttpGet", c_http::http_get);
         utils.add_function(L, "HttpGetAsync", c_http::http_get);

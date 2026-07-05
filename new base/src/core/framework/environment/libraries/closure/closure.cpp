@@ -18,7 +18,7 @@ namespace module::core::environment
         auto src = sol::stack::get<std::string>(L, 1);
         auto cn = lua_isstring(L, 2)
             ? sol::stack::get<std::string>(L, 2)
-            : std::string("idk");
+            : std::string("base");
 
         std::string bc = globals.compile_src(src);
 

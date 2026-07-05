@@ -5,46 +5,14 @@
 
 namespace module::rbx
 {
-    static uintptr_t get_app_info_safe()
+    static bool read_app_status(int32_t & status)
     {
-        __try
-        {
-            return module::update::app_data::get_app_data_info();
-        }
-        __except (EXCEPTION_EXECUTE_HANDLER)
-        {
-            return 0;
-        }
-    }
-
-    static bool read_app_status_safe(int32_t & status)
-    {
-        __try
-        {
-            uintptr_t info = module::update::app_data::get_app_data_info();
-            if (!info)
-                return false;
-
-            status = module::update::app_data::app_status.get(info);
-            return true;
-        }
-        __except (EXCEPTION_EXECUTE_HANDLER)
-        {
+        uintptr_t info = module::update::appdata::get();
+        if (!info)
             return false;
-        }
-    }
 
-    static bool read_place_id_safe(uintptr_t dm, int64_t & place_id)
-    {
-        __try
-        {
-            place_id = module::update::data_model::place_id.get(dm);
-            return true;
-        }
-        __except (EXCEPTION_EXECUTE_HANDLER)
-        {
-            return false;
-        }
+        status = module::update::appdata::app_status.get(info);
+        return true;
     }
 
     static bool is_game_ready(uintptr_t dm)
@@ -53,17 +21,10 @@ namespace module::rbx
             return false;
 
         int32_t status = 0;
-        if (!read_app_status_safe(status))
+        if (!read_app_status(status))
             return false;
 
         if (status != 4)
-            return false;
-
-        int64_t place_id = 0;
-        if (!read_place_id_safe(dm, place_id))
-            return false;
-
-        if (place_id <= 0)
             return false;
 
         return true;

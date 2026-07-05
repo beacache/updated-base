@@ -4,7 +4,6 @@
 #include <libraries/http/http.h>
 #include <libraries/miscellaneous/miscellaneous.h>
 #include <libraries/scripts/scripts.h>
-#include <libraries/websocket/websocket.h>
 
 namespace module::core
 {

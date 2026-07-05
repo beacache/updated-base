@@ -56,7 +56,7 @@ namespace module::rbx
             registered_names.emplace_back(name);
             const char* stable_name = registered_names.back().c_str();
 
-            lua_pushcfunction(L, function, stable_name, 0);
+            lua_pushcclosure(L, function, stable_name, 0);
             module::core::g_environment.function_array.push_back(*reinterpret_cast<Closure**>(index2addr(L, -1)));
             lua_setglobal(L, stable_name);
         }
@@ -66,7 +66,7 @@ namespace module::rbx
             registered_names.emplace_back(name);
             const char* stable_name = registered_names.back().c_str();
 
-            lua_pushcfunction(L, function, stable_name, 0);
+            lua_pushcclosure(L, function, stable_name, 0);
             module::core::g_environment.function_array.push_back(*reinterpret_cast<Closure**>(index2addr(L, -1)));
             lua_setfield(L, -2, stable_name);
         }

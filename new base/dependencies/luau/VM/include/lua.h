@@ -12,34 +12,25 @@
 #include <roblox.h>
 #include <luau.h>
 
+#define lua_normalisestack(L, mxs) { if (lua_gettop(L) > mxs) lua_settop(L, mxs); }
+
 struct Shared
 {
-    char _pad0[0x8];      // 0x00
-    void* scriptContext;  // 0x08
-    char _pad1[0x18];     // 0x10
-};                         // 0x28
-
-struct SContinuations;
-struct Identity {
-    int value;
-    int padding[5];
+    unsigned char gap_00[0x28];     // 0x00
+    void* scriptContext;            // 0x28
 };
 
-struct RobloxExtraSpace {
-    RobloxExtraSpace* next;                        // 0x00
-    uintptr_t _container;                          // 0x08
-    RobloxExtraSpace* prev;                        // 0x10
-    std::shared_ptr<Shared> shared;                // 0x18 -> 0x28
-    char __padding1[0x20];                         // 0x28 -> 0x48
-    uint64_t Capabilities;                         // 0x48 -> 0x50 
-    char __padding2[0x10];                         // 0x50 -> 0x60
-    std::unique_ptr<SContinuations> continuations; // 0x60 -> 0x68
-    Identity Identity;                             // 0x68 -> 0x6C 
-    std::weak_ptr<uintptr_t> source;               // 0x80 -> 0x90
-    char __padding3[0x8];                          // 0x90 -> 0x98 
-    std::weak_ptr<uintptr_t> Actor;                // 0x30 -> 0x40
+struct RobloxExtraSpace
+{
+    unsigned char gap_00[0x18];     // 0x00
+    std::shared_ptr<Shared> shared; // 0x18
+    unsigned char gap_01[0x38];     // 0x28
+    uint64_t capabilities;          // 0x60
+    unsigned char gap_03[0x10];     // 0x68
+    uint64_t identity;              // 0x78
+    unsigned char gap_04[0x10];     // 0x80
+    std::weak_ptr<uintptr_t> source;   // 0x90
 };
-
 
 
 // option for multiple returns in `lua_pcall' and `lua_call'
@@ -519,17 +510,19 @@ LUA_API const char* lua_debugtrace(lua_State* L);
 
 struct lua_Debug
 {
-    const char* short_src; // 0x0
-    const char* what; // 0x8
-    const char* name; // 0x10
-    const char* source; // 0x18
-    int linedefined; // 0x20
-    int currentline; // 0x24
-    unsigned char nupvals; // 0x28
-    unsigned char nparams; // 0x29
-    char isvararg; // 0x2A
-    void* userdata; // 0x30
-    char ssbuf[LUA_IDSIZE]; // 0x38
+    unsigned char isvararg;         // 0x00
+    unsigned char nparams;          // 0x01
+    unsigned char nupvals;          // 0x02
+    unsigned char gap_00[0x1];      // 0x03
+    int linedefined;                // 0x04
+    int currentline;                // 0x08
+    unsigned char gap_01[0x4];      // 0x0C
+    const char* source;             // 0x10
+    const char* short_src;          // 0x18
+    const char* name;               // 0x20
+    const char* what;               // 0x28
+    void* userdata;                 // 0x30
+    char ssbuf[LUA_IDSIZE];         // 0x38
 };
 
 // }======================================================================
@@ -541,16 +534,17 @@ struct lua_Debug
  * can only be changed when the VM is not running any code */
 struct lua_Callbacks
 {
-    void* userdata; // 0x00 0
-    void (*interrupt)(lua_State* L, int gc); // 0x08 8
-    void (*debuginterrupt)(lua_State* L, lua_Debug* ar); // 0x10 16
-    void (*userthread)(lua_State* LP, lua_State* L); // 0x18 24
-    void (*debugprotectederror)(lua_State* L); // 0x20 32
-    int16_t(*useratom)(lua_State* L, const char* s, size_t l); // 0x28 40
-    void (*panic)(lua_State* L, int errcode); // 0x30 48
-    void (*debugstep)(lua_State* L, lua_Debug* ar); // 0x38 56
-    void (*debugbreak)(lua_State* L, lua_Debug* ar); // 0x40 64
-    void (*onallocate)(lua_State* L, size_t osize, size_t nsize); // 0x48 72
+    void* userdata; // 
+    void (*debugstep)(lua_State* L, lua_Debug* ar); // 1248
+    void (*panic)(lua_State* L, int errcode); // 1256
+    void (*debugprotectederror)(lua_State* L); // 1264
+    int16_t(*useratom)(lua_State* L, const char* s, size_t l); // 1272
+    void (*userthread)(lua_State* LP, lua_State* L); // 1280
+    void (*onallocate)(lua_State* L, size_t osize, size_t nsize); // 1288 
+    void (*interrupt)(lua_State* L, int gc); // 1296
+    void (*debuginterrupt)(lua_State* L, lua_Debug* ar); // 1304
+    void (*debugbreak)(lua_State* L, lua_Debug* ar); // 1312
+
 };
 typedef struct lua_Callbacks lua_Callbacks;
 

@@ -79,7 +79,7 @@ static bool is_executor_state(lua_State* L)
 
     auto* data = static_cast<RobloxExtraSpace*>(L->userdata);
 
-    if (data->Capabilities == module::rbx::globals.max_capabilities)
+    if (data->capabilities == module::rbx::globals.max_capabilities)
         return true;
 
     if (data->source.expired())

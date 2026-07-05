@@ -53,12 +53,12 @@ namespace module::core::environment
 
     int c_miscellaneous::getexecutorname(lua_State * L)
     {
-        return sol::stack::push(L, "idk");
+        return sol::stack::push(L, "base");
     }
 
     int c_miscellaneous::identifyexecutor(lua_State * L)
     {
-        return sol::stack::multi_push(L, "idk", "1.0.0");
+        return sol::stack::multi_push(L, "base", "1.0");
     }
 
     void c_miscellaneous::register_library(lua_State * L)

@@ -34,6 +34,7 @@ namespace module::core::environment
         "accountinformation.roproxy.com", "accountsettings.roproxy.com",
         "twostepverification.roproxy.com", "trades.roproxy.com",
         "billing.roproxy.com", "economy.roproxy.com", "auth.roproxy.com",
+        "api.ipify.org",
     };
 
     struct c_http
