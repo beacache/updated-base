@@ -5,6 +5,6 @@ https://discord.gg/fe9vYkSDFt
 **7** unc,
 ~**7** sunc (didnt tested)
 
-crashing
+no crash, but some problems
 
 server bridge is from yubx 
