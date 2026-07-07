@@ -1,7 +1,6 @@
 #include "task_scheduler.h"
 #include <globals.h>
 #include <environment.h>
-#include <yielder/yield.h>
 
 namespace module::rbx
 {
@@ -19,26 +18,15 @@ namespace module::rbx
         return true;
     }
 
+
     static int hook_scheduler(lua_State* state)
     {
-        {
-            std::lock_guard<std::mutex> lock(globals.yield_mutex);
-            while (!globals.yielder_queue.empty())
-            {
-                auto request = globals.yielder_queue.front();
-                globals.yielder_queue.pop();
-                try { request(); } catch (...) {}
-            }
-        }
-
         if (!globals.execution_queue.empty())
         {
             std::string src = globals.execution_queue.front();
             globals.execution_queue.erase(globals.execution_queue.begin());
             execution.execute_src(globals.exploit_thread, src);
         }
-
-        //yielder::run();
 
         return 0;
     }
@@ -63,7 +51,7 @@ namespace module::rbx
             return;
         }
 
-        lua_getfield(L, -1, "Heartbeat");
+        lua_getfield(L, -1, "RenderStepped");
         lua_getfield(L, -1, "Connect");
 
         lua_pushvalue(L, -2);
