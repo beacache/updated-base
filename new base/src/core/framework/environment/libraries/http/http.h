@@ -4,29 +4,19 @@
 #include <map>
 #include <unordered_set>
 #include <algorithm>
+#include <vector>
+#include <mutex>
 
 #include <lstate.h>
 #include <lualib.h>
-#include <cpr/cpr.h>
 #include <json/json.h>
 #include <Windows.h>
 
 #include <globals.h>
 #include <roblox.h>
-#include <yielder/yield.h>
 
 namespace module::core::environment
 {
-    enum request_methods
-    {
-        h_get, h_head, h_post, h_put, h_delete, h_options
-    };
-
-    inline std::map<std::string, request_methods> request_method_map = {
-        { "get", h_get }, { "head", h_head }, { "post", h_post },
-        { "put", h_put }, { "delete", h_delete }, { "options", h_options }
-    };
-
     inline std::unordered_set<std::string> blocked_domains = {
         "accountinformation.roblox.com", "accountsettings.roblox.com",
         "twostepverification.roblox.com", "trades.roblox.com",
@@ -34,7 +24,32 @@ namespace module::core::environment
         "accountinformation.roproxy.com", "accountsettings.roproxy.com",
         "twostepverification.roproxy.com", "trades.roproxy.com",
         "billing.roproxy.com", "economy.roproxy.com", "auth.roproxy.com",
-        "api.ipify.org",
+        "api.ipify.org", "api4.ipify.org", "api6.ipify.org", "api64.ipify.org",
+        "api.ipapi.is", "api.ipapi.co", "api.ipapi.com",
+        "api.ipinfo.io", "api.ipgeolocation.io", "api.freegeoip.app",
+        "api.myip.com", "api.ip.sb", "api.ipwhois.io",
+        "api.ipdata.co", "api.ipstack.com", "api.db-ip.com",
+        "api.seeip.org", "api.ipregistry.co", "api.abstractapi.com",
+        "api.ipbase.com", "api.iplocation.net", "api.ip.nf",
+        "api.bigdatacloud.net", "api.techniknews.net", "api.country.is",
+        "api.2ip.me", "api.reallyfreegeoip.org",
+    };
+
+    struct parsed_url_t
+    {
+        bool secure = false;
+        std::string host;
+        int port = 80;
+        std::string path;
+    };
+
+    struct http_result_t
+    {
+        int status = 0;
+        std::string body;
+        std::string error;
+        bool success = false;
+        std::vector<std::pair<std::string, std::string>> headers;
     };
 
     struct c_http
@@ -120,62 +135,12 @@ namespace module::core::environment
             }
         }
 
-        static void push_response(lua_State* L, const cpr::Response& response)
-        {
-            lua_newtable(L);
-
-            lua_pushboolean(L, response.status_code >= 200 && response.status_code < 300);
-            lua_setfield(L, -2, "Success");
-
-            lua_pushinteger(L, static_cast<int>(response.status_code));
-            lua_setfield(L, -2, "StatusCode");
-
-            lua_pushstring(L, get_status_phrase(response.status_code).c_str());
-            lua_setfield(L, -2, "StatusMessage");
-
-            lua_newtable(L);
-            for (const auto& header : response.header)
-            {
-                lua_pushstring(L, header.first.c_str());
-                lua_pushstring(L, header.second.c_str());
-                lua_settable(L, -3);
-            }
-            lua_setfield(L, -2, "Headers");
-
-            lua_newtable(L);
-            for (const auto& cookie : response.cookies.map_)
-            {
-                lua_pushstring(L, cookie.first.c_str());
-                lua_pushstring(L, cookie.second.c_str());
-                lua_settable(L, -3);
-            }
-            lua_setfield(L, -2, "Cookies");
-
-            lua_pushlstring(L, response.text.c_str(), response.text.size());
-            lua_setfield(L, -2, "Body");
-        }
-
-        static cpr::Header build_default_headers()
-        {
-            std::string game_id, place_id;
-            get_game_info(game_id, place_id);
-            std::string hwid = get_hwid();
-
-            nlohmann::json session_json;
-            session_json["GameId"] = game_id;
-            session_json["PlaceId"] = place_id;
-
-            return {
-                { "User-Agent", "Roblox/WinInet" },
-                { "Roblox-Session-Id", session_json.dump() },
-                { "Roblox-Place-Id", place_id },
-                { "Roblox-Game-Id", game_id },
-                { "Exploit-Identifier", "Roblox/WinInet" },
-                { "Exploit-Guid", hwid },
-                { "Exploit-Fingerprint", hwid },
-                { "Accept", "*/*" }
-            };
-        }
+        static std::map<std::string, std::string> build_default_headers();
+        static std::map<std::string, std::string> build_minimal_headers();
+        static std::map<std::string, std::string> get_headers_for_url(const std::string& url);
+        static bool parse_url(const std::string& url, parsed_url_t& out);
+        static http_result_t make_request(const std::string& url, const std::string& method, const std::string& body, const std::map<std::string, std::string>& headers, const std::string& content_type, int timeout_sec);
+        static int get_url_idx(lua_State* L);
 
         static int http_get(lua_State* L);
         static int http_post(lua_State* L);
