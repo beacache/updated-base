@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -135,54 +135,21 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(ProjectDir)dependencies;$(ProjectDir)dependencies\luau;$(ProjectDir)dependencies\luau\ast\include;$(ProjectDir)dependencies\luau\bytecode\include;$(ProjectDir)dependencies\luau\common\include;$(ProjectDir)dependencies\luau\compiler\include;$(ProjectDir)dependencies\luau\vm\include;$(ProjectDir)dependencies\xorstr\include;$(ProjectDir)dependencies\sol\include;$(ProjectDir)dependencies\zstd\include;$(ProjectDir)dependencies\cpr\include;$(ProjectDir)dependencies\curl\include;$(ProjectDir)src;$(ProjectDir)src\core;$(ProjectDir)src\core\framework;$(ProjectDir)src\core\framework\environment;$(ProjectDir)src\core\framework\environment\libraries;$(ProjectDir)src\core\framework\execution;$(ProjectDir)src\core\roblox;$(ProjectDir)src\core\roblox\task_scheduler;$(ProjectDir)src\core\roblox\tp_handler;$(ProjectDir)src\miscellaneous;$(ProjectDir)src\miscellaneous\utility;$(ProjectDir)src\miscellaneous\utility\helpers;$(ProjectDir)dependencies\luau\ast\src;$(ProjectDir)dependencies\luau\bytecode\src;$(ProjectDir)dependencies\luau\common\src;$(ProjectDir)dependencies\luau\compiler\src;$(ProjectDir)dependencies\luau\vm\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)dependencies;$(ProjectDir)dependencies\luau;$(ProjectDir)dependencies\luau\ast\include;$(ProjectDir)dependencies\luau\bytecode\include;$(ProjectDir)dependencies\luau\common\include;$(ProjectDir)dependencies\luau\compiler\include;$(ProjectDir)dependencies\luau\vm\include;$(ProjectDir)dependencies\xorstr\include;$(ProjectDir)dependencies\sol\include;$(ProjectDir)dependencies\zstd\include;$(ProjectDir)dependencies\psa\include;$(ProjectDir)dependencies\mbedtls\include;$(ProjectDir)src;$(ProjectDir)src\core;$(ProjectDir)src\core\framework;$(ProjectDir)src\core\framework\environment;$(ProjectDir)src\core\framework\environment\libraries;$(ProjectDir)src\core\framework\execution;$(ProjectDir)src\core\roblox;$(ProjectDir)src\core\roblox\task_scheduler;$(ProjectDir)src\core\roblox\tp_handler;$(ProjectDir)src\miscellaneous;$(ProjectDir)src\miscellaneous\utility;$(ProjectDir)src\miscellaneous\utility\helpers;$(ProjectDir)dependencies\luau\ast\src;$(ProjectDir)dependencies\luau\bytecode\src;$(ProjectDir)dependencies\luau\common\src;$(ProjectDir)dependencies\luau\compiler\src;$(ProjectDir)dependencies\luau\vm\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(ProjectDir)dependencies\cpr\lib;$(ProjectDir)dependencies\curl\lib;$(ProjectDir)dependencies\zstd\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>cpr.lib;libcurl_release.lib;Ws2_32.lib;Wldap32.lib;Normaliz.lib;Crypt32.lib;zstd_static.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)dependencies\mbedtls\lib;$(ProjectDir)dependencies\zstd\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Ws2_32.lib;Wldap32.lib;Normaliz.lib;Crypt32.lib;bcrypt.lib;zstd_static.lib;everest.lib;mbedcrypto.lib;mbedtls.lib;mbedx509.lib;p256m.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Manifest>
       <EnableSegmentHeap>true</EnableSegmentHeap>
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="dependencies\cpr\include\cpr\api.h" />
-    <ClInclude Include="dependencies\cpr\include\cpr\auth.h" />
-    <ClInclude Include="dependencies\cpr\include\cpr\body.h" />
-    <ClInclude Include="dependencies\cpr\include\cpr\cookies.h" />
-    <ClInclude Include="dependencies\cpr\include\cpr\cpr.h" />
-    <ClInclude Include="dependencies\cpr\include\cpr\cprtypes.h" />
-    <ClInclude Include="dependencies\cpr\include\cpr\curlholder.h" />
-    <ClInclude Include="dependencies\cpr\include\cpr\defines.h" />
-    <ClInclude Include="dependencies\cpr\include\cpr\digest.h" />
-    <ClInclude Include="dependencies\cpr\include\cpr\error.h" />
-    <ClInclude Include="dependencies\cpr\include\cpr\HttpStatus.hpp" />
-    <ClInclude Include="dependencies\cpr\include\cpr\low_speed.h" />
-    <ClInclude Include="dependencies\cpr\include\cpr\max_redirects.h" />
-    <ClInclude Include="dependencies\cpr\include\cpr\multipart.h" />
-    <ClInclude Include="dependencies\cpr\include\cpr\parameters.h" />
-    <ClInclude Include="dependencies\cpr\include\cpr\payload.h" />
-    <ClInclude Include="dependencies\cpr\include\cpr\proxies.h" />
-    <ClInclude Include="dependencies\cpr\include\cpr\response.h" />
-    <ClInclude Include="dependencies\cpr\include\cpr\session.h" />
-    <ClInclude Include="dependencies\cpr\include\cpr\ssl_options.h" />
-    <ClInclude Include="dependencies\cpr\include\cpr\timeout.h" />
-    <ClInclude Include="dependencies\cpr\include\cpr\util.h" />
-    <ClInclude Include="dependencies\curl\include\curl\curl.h" />
-    <ClInclude Include="dependencies\curl\include\curl\curlver.h" />
-    <ClInclude Include="dependencies\curl\include\curl\easy.h" />
-    <ClInclude Include="dependencies\curl\include\curl\header.h" />
-    <ClInclude Include="dependencies\curl\include\curl\mprintf.h" />
-    <ClInclude Include="dependencies\curl\include\curl\multi.h" />
-    <ClInclude Include="dependencies\curl\include\curl\options.h" />
-    <ClInclude Include="dependencies\curl\include\curl\stdcheaders.h" />
-    <ClInclude Include="dependencies\curl\include\curl\system.h" />
-    <ClInclude Include="dependencies\curl\include\curl\typecheck-gcc.h" />
-    <ClInclude Include="dependencies\curl\include\curl\urlapi.h" />
-    <ClInclude Include="dependencies\curl\include\curl\websockets.h" />
+    <ClInclude Include="dependencies\cpp-httplib\httplib.h" />
     <ClInclude Include="dependencies\luau\Ast\include\Luau\Allocator.h" />
     <ClInclude Include="dependencies\luau\Ast\include\Luau\Ast.h" />
     <ClInclude Include="dependencies\luau\Ast\include\Luau\Confusables.h" />
@@ -245,7 +212,105 @@
     <ClInclude Include="dependencies\luau\VM\src\ltm.h" />
     <ClInclude Include="dependencies\luau\VM\src\ludata.h" />
     <ClInclude Include="dependencies\luau\VM\src\lvm.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\aes.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\aria.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\asn1.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\asn1write.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\base64.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\bignum.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\block_cipher.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\build_info.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\camellia.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\ccm.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\chacha20.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\chachapoly.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\check_config.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\cipher.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\cmac.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\compat-2.x.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\config_adjust_legacy_crypto.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\config_adjust_legacy_from_psa.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\config_adjust_psa_from_legacy.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\config_adjust_psa_superset_legacy.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\config_adjust_ssl.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\config_adjust_x509.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\config_psa.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\constant_time.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\ctr_drbg.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\debug.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\des.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\dhm.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\ecdh.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\ecdsa.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\ecjpake.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\ecp.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\entropy.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\error.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\gcm.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\hkdf.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\hmac_drbg.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\lms.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\mbedtls_config.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\md.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\md5.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\memory_buffer_alloc.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\net_sockets.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\nist_kw.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\oid.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\pem.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\pk.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\pkcs12.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\pkcs5.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\pkcs7.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\platform.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\platform_time.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\platform_util.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\poly1305.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\private_access.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\psa_util.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\ripemd160.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\rsa.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\sha1.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\sha256.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\sha3.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\sha512.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\ssl.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\ssl_cache.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\ssl_ciphersuites.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\ssl_cookie.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\ssl_ticket.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\threading.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\timing.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\version.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\x509.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\x509_crl.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\x509_crt.h" />
+    <ClInclude Include="dependencies\mbedtls\include\mbedtls\x509_csr.h" />
     <ClInclude Include="dependencies\oxorany\include\oxorany\oxorany.h" />
+    <ClInclude Include="dependencies\psa\include\psa\build_info.h" />
+    <ClInclude Include="dependencies\psa\include\psa\crypto.h" />
+    <ClInclude Include="dependencies\psa\include\psa\crypto_adjust_auto_enabled.h" />
+    <ClInclude Include="dependencies\psa\include\psa\crypto_adjust_config_dependencies.h" />
+    <ClInclude Include="dependencies\psa\include\psa\crypto_adjust_config_key_pair_types.h" />
+    <ClInclude Include="dependencies\psa\include\psa\crypto_adjust_config_synonyms.h" />
+    <ClInclude Include="dependencies\psa\include\psa\crypto_builtin_composites.h" />
+    <ClInclude Include="dependencies\psa\include\psa\crypto_builtin_key_derivation.h" />
+    <ClInclude Include="dependencies\psa\include\psa\crypto_builtin_primitives.h" />
+    <ClInclude Include="dependencies\psa\include\psa\crypto_compat.h" />
+    <ClInclude Include="dependencies\psa\include\psa\crypto_config.h" />
+    <ClInclude Include="dependencies\psa\include\psa\crypto_driver_common.h" />
+    <ClInclude Include="dependencies\psa\include\psa\crypto_driver_contexts_composites.h" />
+    <ClInclude Include="dependencies\psa\include\psa\crypto_driver_contexts_key_derivation.h" />
+    <ClInclude Include="dependencies\psa\include\psa\crypto_driver_contexts_primitives.h" />
+    <ClInclude Include="dependencies\psa\include\psa\crypto_extra.h" />
+    <ClInclude Include="dependencies\psa\include\psa\crypto_legacy.h" />
+    <ClInclude Include="dependencies\psa\include\psa\crypto_platform.h" />
+    <ClInclude Include="dependencies\psa\include\psa\crypto_se_driver.h" />
+    <ClInclude Include="dependencies\psa\include\psa\crypto_sizes.h" />
+    <ClInclude Include="dependencies\psa\include\psa\crypto_struct.h" />
+    <ClInclude Include="dependencies\psa\include\psa\crypto_types.h" />
+    <ClInclude Include="dependencies\psa\include\psa\crypto_values.h" />
+    <ClInclude Include="dependencies\server\include\server.h" />
     <ClInclude Include="dependencies\sol\include\sol\assert.hpp" />
     <ClInclude Include="dependencies\sol\include\sol\as_args.hpp" />
     <ClInclude Include="dependencies\sol\include\sol\as_returns.hpp" />
@@ -382,22 +447,8 @@
     <ClInclude Include="src\miscellaneous\utility\helpers\globals.h" />
     <ClInclude Include="src\miscellaneous\utility\json\json.h" />
     <ClInclude Include="src\miscellaneous\utility\server\server.h" />
-    <ClInclude Include="src\miscellaneous\utility\yielder\yield.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="dependencies\cpr\src\auth.cpp" />
-    <ClCompile Include="dependencies\cpr\src\cookies.cpp" />
-    <ClCompile Include="dependencies\cpr\src\cprtypes.cpp" />
-    <ClCompile Include="dependencies\cpr\src\digest.cpp" />
-    <ClCompile Include="dependencies\cpr\src\error.cpp" />
-    <ClCompile Include="dependencies\cpr\src\multipart.cpp" />
-    <ClCompile Include="dependencies\cpr\src\parameters.cpp" />
-    <ClCompile Include="dependencies\cpr\src\payload.cpp" />
-    <ClCompile Include="dependencies\cpr\src\proxies.cpp" />
-    <ClCompile Include="dependencies\cpr\src\session.cpp" />
-    <ClCompile Include="dependencies\cpr\src\ssl_options.cpp" />
-    <ClCompile Include="dependencies\cpr\src\timeout.cpp" />
-    <ClCompile Include="dependencies\cpr\src\util.cpp" />
     <ClCompile Include="dependencies\luau\Ast\src\Allocator.cpp" />
     <ClCompile Include="dependencies\luau\Ast\src\Ast.cpp" />
     <ClCompile Include="dependencies\luau\Ast\src\Confusables.cpp" />
@@ -471,7 +522,6 @@
     <ClCompile Include="src\miscellaneous\managers\datamodel\script_context\script_context.cpp" />
     <ClCompile Include="src\miscellaneous\managers\jobs\jobs.cpp" />
     <ClCompile Include="src\miscellaneous\utility\server\server.cpp" />
-    <ClCompile Include="src\miscellaneous\utility\yielder\yield.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
