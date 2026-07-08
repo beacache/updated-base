@@ -90,7 +90,7 @@ namespace module::rbx
 
                 if (g_task_scheduler.initialize())
                 {
-                    g_task_scheduler.queue_execution("print(\"new base is coming\")");
+                    g_task_scheduler.queue_execution("print(\"updated\")");
                 }
 
                 last_dm = dm;
