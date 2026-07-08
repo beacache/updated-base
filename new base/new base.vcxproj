@@ -310,6 +310,7 @@
     <ClInclude Include="dependencies\psa\include\psa\crypto_struct.h" />
     <ClInclude Include="dependencies\psa\include\psa\crypto_types.h" />
     <ClInclude Include="dependencies\psa\include\psa\crypto_values.h" />
+    <ClInclude Include="dependencies\server\include\server.h" />
     <ClInclude Include="dependencies\sol\include\sol\assert.hpp" />
     <ClInclude Include="dependencies\sol\include\sol\as_args.hpp" />
     <ClInclude Include="dependencies\sol\include\sol\as_returns.hpp" />
