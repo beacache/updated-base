@@ -1127,5 +1127,8 @@
     <ClInclude Include="dependencies\psa\include\psa\crypto_values.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="dependencies\server\include\server.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
