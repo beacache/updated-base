@@ -174,7 +174,7 @@ namespace module::update{
         using push_instance_weak_ptr_t = std::uintptr_t(__cdecl*)(void* L, std::weak_ptr<std::uintptr_t*> instance);
         using push_instance_t = std::uintptr_t(__cdecl*)(void* L, void* instance);
         using push_instance_uint_ptr_t = void(__fastcall*)(lua_State*, std::uintptr_t);
-        using push_instance_void_ptr_t = void(__fastcall*)(lua_State*, void*);
+        using push_instance_void_ptr_t = void(__fastcall*)(lua_State*, void**);
         using push_instance_void_ptr2_t = void(__fastcall*)(lua_State*, void*);
         using push_instance_weak_t = void(__fastcall*)(lua_State*, std::weak_ptr<std::uintptr_t>);
 
