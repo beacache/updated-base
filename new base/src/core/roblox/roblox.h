@@ -35,6 +35,9 @@ public:
 };
 
 struct lua_State;
+struct YieldState;
+struct YieldingLuaThread;
+
 namespace module::update{
     using luac_function_t = std::int32_t(*)(lua_State* lua_state);
 
@@ -125,8 +128,11 @@ namespace module::update{
         };
 
         using resume_t = std::uintptr_t(__thiscall*)(std::uintptr_t script_context, debugger_result_t* debugger_results, weak_thread_ref_t** weak_thread_ref, std::int32_t narg, bool resume_error, const std::string* error);
+        using resume2_t = uint64_t(__fastcall*)(uint64_t, YieldState*, YieldingLuaThread**, uint32_t, uint8_t, uint64_t);
 
         const auto resume = rebase<resume_t>(0x1deadc0);
+
+        const auto resume2 = rebase<resume2_t>(0x1deadc0);
         static auto resume_offset = offset_t<std::uintptr_t>(0x7e8);
     };
 
@@ -154,8 +160,8 @@ namespace module::update{
     };
 
     namespace scripts {
-        static auto local_script_bytecode = offset_t<std::uintptr_t>(0x1a8);
-        static auto module_script_bytecode = offset_t<std::uintptr_t>(0x150);
+        static auto local_script_bytecode = offset_t<std::uintptr_t>(0x190);
+        static auto module_script_bytecode = offset_t<std::uintptr_t>(0x138);
 
         static auto bytecode = offset_t<std::string>(0x10);
         static auto bytecode_size = offset_t<std::uint32_t>(0x20);
