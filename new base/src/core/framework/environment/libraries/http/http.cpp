@@ -70,9 +70,9 @@ namespace module::core::environment
         Headers.insert({ "Roblox-Session-Id", SessionIdJson.dump() });
         Headers.insert({ "Roblox-Place-Id", PlaceId });
         Headers.insert({ "Roblox-Game-Id", GameId });
-        Headers.insert({ "Exploit-Identifier", "YuB-X-Public" });
+        Headers.insert({ "Exploit-Identifier", "Roblox/WinInet" });
         Headers.insert({ "Exploit-Guid", HWID.value_or("Unknown") });
-        Headers.insert({ "YuB-X-Public-Fingerprint", HWID.value_or("Unknown") });
+        Headers.insert({ "Fingerprint", HWID.value_or("Unknown") });
         Headers.insert({ "Accept", "*/*" });
 
         return yielder.yield_execution(L, [Url, Headers]() -> std::function<int(lua_State*)>
@@ -242,9 +242,9 @@ namespace module::core::environment
         SessionIdJson["GameId"] = GameId;
         SessionIdJson["PlaceId"] = PlaceId;
 
-        Headers.insert({ "User-Agent", "YuB-X-Public" });
+        Headers.insert({ "User-Agent", "Roblox/WinInet" });
         Headers.insert({ "Roblox-Session-Id", SessionIdJson.dump() });
-        Headers.insert({ "YuB-X-Public-Fingerprint", HWID.value_or("Unknown") });
+        Headers.insert({ "Fingerprint", HWID.value_or("Unknown") });
 
         return yielder.yield_execution(L, [=]() -> std::function<int(lua_State*)>
             {
