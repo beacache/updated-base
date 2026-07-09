@@ -1,422 +1,400 @@
 #include "http.h"
-
-#define CPPHTTPLIB_MBEDTLS_SUPPORT
-#include <cpp-httplib/httplib.h>
-#include <thread>
+#include <cpr/cpr.h>
+#include <miscellaneous/utility/yielder/yielder.h>
 
 namespace module::core::environment
 {
     using namespace module::rbx;
 
-    bool c_http::parse_url(const std::string& url, parsed_url_t& out)
+    int c_http::http_get(lua_State * L)
     {
-        out.secure = false;
-        out.port = 80;
+        std::string Url;
 
-        std::string u = url;
-        if (u.rfind("https://", 0) == 0)
+        if (!lua_isstring(L, 1))
         {
-            out.secure = true;
-            out.port = 443;
-            u = u.substr(8);
-        }
-        else if (u.rfind("http://", 0) == 0)
-        {
-            u = u.substr(7);
+            luaL_checkstring(L, 2);
+            Url = lua_tostring(L, 2);
         }
         else
         {
-            return false;
+            Url = lua_tostring(L, 1);
         }
 
-        auto slash = u.find('/');
-        if (slash == std::string::npos)
+        if (Url.find("http://") != 0 && Url.find("https://") != 0)
         {
-            out.host = u;
-            out.path = "/";
-        }
-        else
-        {
-            out.host = u.substr(0, slash);
-            out.path = u.substr(slash);
+            luaL_argerror(L, 2, "Invalid protocol (expected 'http://' or 'https://')");
+            return 0;
         }
 
-        auto colon = out.host.find(':');
-        if (colon != std::string::npos)
+        std::string GameId;
+        lua_getglobal(L, "game");
+        if (lua_istable(L, -1))
         {
-            try
+            lua_getfield(L, -1, "GameId");
+            if (lua_isstring(L, -1))
+                GameId = lua_tostring(L, -1);
+
+            lua_pop(L, 1);
+        }
+        lua_pop(L, 1);
+
+        std::string PlaceId;
+        lua_getglobal(L, "game");
+        if (lua_istable(L, -1))
+        {
+            lua_getfield(L, -1, "PlaceId");
+            if (lua_isstring(L, -1))
+                PlaceId = lua_tostring(L, -1);
+
+            lua_pop(L, 1);
+        }
+        lua_pop(L, 1);
+
+        HW_PROFILE_INFO hwProfileInfo;
+        std::optional<std::string> HWID;
+        if (GetCurrentHwProfile(&hwProfileInfo))
+        {
+            std::wstring wGuid(hwProfileInfo.szHwProfileGuid);
+            std::string Guid(wGuid.begin(), wGuid.end());
+            HWID = Guid;
+        }
+
+        using Json = nlohmann::json;
+        cpr::Header Headers;
+        Json SessionIdJson;
+
+        SessionIdJson["GameId"] = GameId;
+        SessionIdJson["PlaceId"] = PlaceId;
+
+        Headers.insert({ "User-Agent", "Roblox/WinInet" });
+        Headers.insert({ "Roblox-Session-Id", SessionIdJson.dump() });
+        Headers.insert({ "Roblox-Place-Id", PlaceId });
+        Headers.insert({ "Roblox-Game-Id", GameId });
+        Headers.insert({ "Exploit-Identifier", "YuB-X-Public" });
+        Headers.insert({ "Exploit-Guid", HWID.value_or("Unknown") });
+        Headers.insert({ "YuB-X-Public-Fingerprint", HWID.value_or("Unknown") });
+        Headers.insert({ "Accept", "*/*" });
+
+        return yielder.yield_execution(L, [Url, Headers]() -> std::function<int(lua_State*)>
             {
-                out.port = std::stoi(out.host.substr(colon + 1));
-            }
-            catch (...)
-            {
-                return false;
-            }
-            out.host = out.host.substr(0, colon);
-        }
-
-        return !out.host.empty();
-    }
-
-    http_result_t c_http::make_request(const std::string& url, const std::string& method, const std::string& body, const std::map<std::string, std::string>& headers, const std::string& content_type, int timeout_sec)
-    {
-        http_result_t resp;
-
-        parsed_url_t parsed;
-        if (!parse_url(url, parsed))
-        {
-            resp.error = "failed to parse url";
-            return resp;
-        }
-
-        try
-        {
-            std::string scheme = parsed.secure ? "https://" : "http://";
-            std::string base = scheme + parsed.host + ":" + std::to_string(parsed.port);
-
-            httplib::Client cli(base);
-            cli.set_connection_timeout(timeout_sec, 0);
-            cli.set_read_timeout(timeout_sec, 0);
-            cli.set_write_timeout(timeout_sec, 0);
-            cli.set_follow_location(true);
-            cli.enable_server_certificate_verification(false);
-
-            httplib::Headers hdrs;
-            for (const auto& h : headers)
-                hdrs.emplace(h.first, h.second);
-
-            httplib::Result result;
-
-            if (method == "GET")
-                result = cli.Get(parsed.path, hdrs);
-            else if (method == "HEAD")
-                result = cli.Head(parsed.path, hdrs);
-            else if (method == "POST")
-                result = cli.Post(parsed.path, hdrs, body, content_type);
-            else if (method == "PUT")
-                result = cli.Put(parsed.path, hdrs, body, content_type);
-            else if (method == "DELETE")
-                result = cli.Delete(parsed.path, hdrs, body, content_type);
-            else if (method == "OPTIONS")
-                result = cli.Options(parsed.path, hdrs);
-            else if (method == "PATCH")
-                result = cli.Patch(parsed.path, hdrs, body, content_type);
-            else
-                result = cli.Get(parsed.path, hdrs);
-
-            if (!result)
-            {
-                auto err = result.error();
-                switch (err)
+                cpr::Response Result;
+                try
                 {
-                    case httplib::Error::Connection:
-                        resp.error = "connection failed";
-                        break;
-                    case httplib::Error::Read:
-                        resp.error = "read error";
-                        break;
-                    case httplib::Error::Write:
-                        resp.error = "write error";
-                        break;
-                    case httplib::Error::SSLConnection:
-                        resp.error = "ssl connection error";
-                        break;
-                    case httplib::Error::SSLServerVerification:
-                        resp.error = "ssl verification error";
-                        break;
-                    case httplib::Error::ConnectionTimeout:
-                        resp.error = "connection timed out";
-                        break;
-                    default:
-                        resp.error = "unknown error";
-                        break;
+                    Result = cpr::Get(cpr::Url{ Url }, cpr::Header(Headers));
                 }
-                return resp;
-            }
+                catch (const std::exception& ex)
+                {
+                    std::stringstream Error;
+                    Error << "HttpGet failed: " << ex.what();
+                    std::string ErrorString = Error.str();
+                    return [ErrorString](lua_State* L) -> int
+                        {
+                            lua_pushstring(L, ErrorString.c_str());
+                            return 1;
+                        };
+                }
+                catch (...)
+                {
+                    return [](lua_State* L) -> int
+                        {
+                            lua_pushstring(L, "HttpGet failed: unknown exception");
+                            return 1;
+                        };
+                }
 
-            resp.status = result->status;
-            resp.body = result->body;
-            resp.success = resp.status >= 200 && resp.status < 300;
+                return [Result, Url](lua_State* L) -> int
+                    {
+                        if (Result.error.code != cpr::ErrorCode::OK)
+                        {
+                            std::stringstream Error;
+                            Error << "HttpGet failed: " << Result.error.message << ", Code: " << Result.status_code;
+                            std::string ErrorString = Error.str();
+                            lua_pushstring(L, ErrorString.c_str());
+                            return 1;
+                        }
 
-            for (const auto& h : result->headers)
-                resp.headers.emplace_back(h.first, h.second);
-        }
-        catch (const std::exception& e)
-        {
-            resp.error = std::string("exception: ") + e.what();
-        }
-        catch (...)
-        {
-            resp.error = "unknown exception";
-        }
+                        if (Result.status_code != 200)
+                        {
+                            std::stringstream Error;
+                            Error << "HttpGet returned status: " << Result.status_code << ", Error: " << Result.error.message;
+                            std::string ErrorString = Error.str();
+                            lua_pushstring(L, ErrorString.c_str());
+                            return 1;
+                        }
 
-        return resp;
+                        lua_pushlstring(L, Result.text.data(), Result.text.size());
+                        return 1;
+                    };
+            });
     }
 
-    int c_http::get_url_idx(lua_State* L)
+    int c_http::request(lua_State * L)
     {
-        int top = lua_gettop(L);
-        for (int i = 1; i <= top; i++)
-        {
-            if (lua_isstring(L, i))
-            {
-                std::string s = lua_tostring(L, i);
-                if (s.rfind("http://", 0) == 0 || s.rfind("https://", 0) == 0)
-                    return i;
-            }
-        }
-        return -1;
-    }
-
-    static bool is_roblox_url(const std::string& url)
-    {
-        std::string lower = url;
-        std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
-        return lower.find("roblox.com") != std::string::npos || lower.find("roproxy.com") != std::string::npos;
-    }
-
-    std::map<std::string, std::string> c_http::build_default_headers()
-    {
-        std::string game_id, place_id;
-        get_game_info(game_id, place_id);
-        std::string hwid = get_hwid();
-
-        nlohmann::json session_json;
-        session_json["GameId"] = game_id;
-        session_json["PlaceId"] = place_id;
-
-        return {
-            { "User-Agent", "Roblox/WinInet" },
-            { "Roblox-Session-Id", session_json.dump() },
-            { "Roblox-Place-Id", place_id },
-            { "Roblox-Game-Id", game_id },
-            { "Exploit-Identifier", "Roblox/WinInet" },
-            { "Exploit-Guid", hwid },
-            { "Exploit-Fingerprint", hwid },
-            { "Accept", "*/*" }
-        };
-    }
-
-    std::map<std::string, std::string> c_http::build_minimal_headers()
-    {
-        return {
-            { "User-Agent", "Roblox/WinInet" },
-            { "Accept", "*/*" }
-        };
-    }
-
-    std::map<std::string, std::string> c_http::get_headers_for_url(const std::string& url)
-    {
-        if (is_roblox_url(url))
-            return build_default_headers();
-        return build_minimal_headers();
-    }
-
-    int c_http::http_get(lua_State* L)
-    {
-        int idx = get_url_idx(L);
-        if (idx == -1)
-        {
-            lua_pushnil(L);
-            lua_pushstring(L, "expected url string");
-            return 2;
-        }
-
-        std::string url = lua_tostring(L, idx);
-
-        if (is_url_blocked(url))
-        {
-            lua_pushnil(L);
-            lua_pushstring(L, "blocked domain");
-            return 2;
-        }
-
-        auto hdrs = get_headers_for_url(url);
-        http_result_t resp = make_request(url, "GET", "", hdrs, "", 15);
-
-        if (!resp.error.empty())
-        {
-            lua_pushnil(L);
-            lua_pushstring(L, resp.error.c_str());
-            return 2;
-        }
-
-        lua_pushlstring(L, resp.body.c_str(), resp.body.size());
-        return 1;
-    }
-
-    int c_http::http_post(lua_State* L)
-    {
-        int idx = get_url_idx(L);
-        if (idx == -1)
-        {
-            lua_pushnil(L);
-            lua_pushstring(L, "expected url string");
-            return 2;
-        }
-
-        std::string url = lua_tostring(L, idx);
-
-        if (is_url_blocked(url))
-        {
-            lua_pushnil(L);
-            lua_pushstring(L, "blocked domain");
-            return 2;
-        }
-
-        std::string body;
-        if (lua_isstring(L, idx + 1))
-            body = lua_tostring(L, idx + 1);
-
-        std::string content_type = "application/x-www-form-urlencoded";
-        if (lua_isstring(L, idx + 2))
-            content_type = lua_tostring(L, idx + 2);
-
-        auto hdrs = get_headers_for_url(url);
-        http_result_t resp = make_request(url, "POST", body, hdrs, content_type, 15);
-
-        if (!resp.error.empty())
-        {
-            lua_pushnil(L);
-            lua_pushstring(L, resp.error.c_str());
-            return 2;
-        }
-
-        lua_pushlstring(L, resp.body.c_str(), resp.body.size());
-        return 1;
-    }
-
-    int c_http::request(lua_State* L)
-    {
-        if (!lua_istable(L, 1))
-        {
-            lua_pushnil(L);
-            lua_pushstring(L, "expected table");
-            return 2;
-        }
+        luaL_checktype(L, 1, LUA_TTABLE);
 
         lua_getfield(L, 1, "Url");
         if (!lua_isstring(L, -1))
-        {
-            lua_pop(L, 1);
-            lua_pushnil(L);
-            lua_pushstring(L, "missing Url");
-            return 2;
-        }
-        std::string url = lua_tostring(L, -1);
+            luaL_error(L, "Missing or invalid 'Url'");
+
+        std::string Url = lua_tostring(L, -1);
         lua_pop(L, 1);
 
-        if (url.rfind("http://", 0) != 0 && url.rfind("https://", 0) != 0)
+        if (Url.find("http://") != 0 && Url.find("https://") != 0)
         {
-            lua_pushnil(L);
-            lua_pushstring(L, "invalid protocol");
-            return 2;
+            luaL_error(L, "Invalid protocol (expected 'http://' or 'https://')");
+            return 0;
         }
 
-        if (is_url_blocked(url))
-        {
-            lua_pushnil(L);
-            lua_pushstring(L, "blocked domain");
-            return 2;
-        }
-
-        std::string method = "GET";
+        auto Method = H_GET;
         lua_getfield(L, 1, "Method");
         if (lua_isstring(L, -1))
         {
-            method = lua_tostring(L, -1);
-            std::transform(method.begin(), method.end(), method.begin(), ::toupper);
+            std::string MethodStr = lua_tostring(L, -1);
+            std::transform(MethodStr.begin(), MethodStr.end(), MethodStr.begin(), ::tolower);
+            if (!request_method_map.count(MethodStr))
+                luaL_error(L, "Invalid request method: '%s'", MethodStr.c_str());
+
+            Method = request_method_map[MethodStr];
         }
         lua_pop(L, 1);
 
-        std::string body;
-        lua_getfield(L, 1, "Body");
-        if (lua_isstring(L, -1))
-            body = lua_tostring(L, -1);
-        lua_pop(L, 1);
-
-        std::string content_type = "application/json";
-        auto hdrs = get_headers_for_url(url);
-
+        cpr::Header Headers;
         lua_getfield(L, 1, "Headers");
         if (lua_istable(L, -1))
         {
             lua_pushnil(L);
             while (lua_next(L, -2))
             {
-                if (lua_isstring(L, -2) && lua_isstring(L, -1))
-                {
-                    std::string key = lua_tostring(L, -2);
-                    std::string val = lua_tostring(L, -1);
+                if (!lua_isstring(L, -2) || !lua_isstring(L, -1))
+                    luaL_error(L, "'Headers' must have string keys/values");
 
-                    std::string key_lower = key;
-                    std::transform(key_lower.begin(), key_lower.end(), key_lower.begin(), ::tolower);
-                    if (key_lower == "content-type")
-                        content_type = val;
-                    else
-                        hdrs[key] = val;
-                }
+                std::string Key = lua_tostring(L, -2);
+                if (_stricmp(Key.c_str(), "Content-Length") == 0)
+                    luaL_error(L, "'Content-Length' cannot be overwritten");
+
+                Headers[Key] = lua_tostring(L, -1);
                 lua_pop(L, 1);
             }
         }
         lua_pop(L, 1);
 
-        int timeout_sec = 15;
-        lua_getfield(L, 1, "Timeout");
-        if (lua_isnumber(L, -1))
-            timeout_sec = (int)lua_tonumber(L, -1);
-        lua_pop(L, 1);
-
-        http_result_t resp = make_request(url, method, body, hdrs, content_type, timeout_sec);
-
-        if (!resp.error.empty())
+        cpr::Cookies Cookies;
+        lua_getfield(L, 1, "Cookies");
+        if (lua_istable(L, -1))
         {
             lua_pushnil(L);
-            lua_pushstring(L, resp.error.c_str());
-            return 2;
+            while (lua_next(L, -2))
+            {
+                if (!lua_isstring(L, -2) || !lua_isstring(L, -1))
+                    luaL_error(L, "'Cookies' must have string keys/values");
+
+                Cookies[lua_tostring(L, -2)] = lua_tostring(L, -1);
+                lua_pop(L, 1);
+            }
         }
+        lua_pop(L, 1);
 
-        lua_newtable(L);
-
-        lua_pushboolean(L, resp.success);
-        lua_setfield(L, -2, "Success");
-
-        lua_pushinteger(L, resp.status);
-        lua_setfield(L, -2, "StatusCode");
-
-        lua_pushstring(L, get_status_phrase(resp.status).c_str());
-        lua_setfield(L, -2, "StatusMessage");
-
-        lua_newtable(L);
-        for (const auto& h : resp.headers)
+        std::string Body;
+        lua_getfield(L, 1, "Body");
+        if (lua_isstring(L, -1))
         {
-            lua_pushstring(L, h.first.c_str());
-            lua_pushstring(L, h.second.c_str());
-            lua_settable(L, -3);
+            if (Method == H_GET || Method == H_HEAD)
+                luaL_error(L, "'Body' is not allowed for GET/HEAD requests");
+
+            Body = lua_tostring(L, -1);
         }
-        lua_setfield(L, -2, "Headers");
+        lua_pop(L, 1);
 
-        lua_newtable(L);
-        lua_setfield(L, -2, "Cookies");
+        std::string GameId;
+        lua_getglobal(L, "game");
+        if (lua_istable(L, -1))
+        {
+            lua_getfield(L, -1, "GameId");
+            if (lua_isstring(L, -1))
+                GameId = lua_tostring(L, -1);
 
-        lua_pushlstring(L, resp.body.c_str(), resp.body.size());
-        lua_setfield(L, -2, "Body");
+            lua_pop(L, 1);
+        }
+        lua_pop(L, 1);
 
-        return 1;
+        std::string PlaceId;
+        lua_getglobal(L, "game");
+        if (lua_istable(L, -1))
+        {
+            lua_getfield(L, -1, "PlaceId");
+            if (lua_isstring(L, -1))
+                PlaceId = lua_tostring(L, -1);
+
+            lua_pop(L, 1);
+        }
+        lua_pop(L, 1);
+
+        HW_PROFILE_INFO hwProfileInfo;
+        std::optional<std::string> HWID;
+        if (GetCurrentHwProfile(&hwProfileInfo))
+        {
+            std::wstring wGuid(hwProfileInfo.szHwProfileGuid);
+            std::string Guid(wGuid.begin(), wGuid.end());
+            HWID = Guid;
+        }
+
+        nlohmann::json SessionIdJson;
+        SessionIdJson["GameId"] = GameId;
+        SessionIdJson["PlaceId"] = PlaceId;
+
+        Headers.insert({ "User-Agent", "YuB-X-Public" });
+        Headers.insert({ "Roblox-Session-Id", SessionIdJson.dump() });
+        Headers.insert({ "YuB-X-Public-Fingerprint", HWID.value_or("Unknown") });
+
+        return yielder.yield_execution(L, [=]() -> std::function<int(lua_State*)>
+            {
+                cpr::Response Response;
+                try
+                {
+                    switch (Method)
+                    {
+                    case H_GET: Response = cpr::Get(cpr::Url{ Url }, Cookies, Headers); break;
+                    case H_HEAD: Response = cpr::Head(cpr::Url{ Url }, Cookies, Headers); break;
+                    case H_POST: Response = cpr::Post(cpr::Url{ Url }, cpr::Body{ Body }, Cookies, Headers); break;
+                    case H_PUT: Response = cpr::Put(cpr::Url{ Url }, cpr::Body{ Body }, Cookies, Headers); break;
+                    case H_DELETE: Response = cpr::Delete(cpr::Url{ Url }, cpr::Body{ Body }, Cookies, Headers); break;
+                    case H_OPTIONS: Response = cpr::Options(cpr::Url{ Url }, cpr::Body{ Body }, Cookies, Headers); break;
+                    default: throw std::runtime_error("Invalid request method"); break;
+                    }
+                }
+                catch (const std::exception& ex)
+                {
+                    std::string Err = std::string("Request failed: ") + ex.what();
+                    return [Err](lua_State* L) -> int
+                        {
+                            lua_pushstring(L, Err.c_str());
+                            return 1;
+                        };
+                }
+
+                return [Response](lua_State* L) -> int
+                    {
+                        if (Response.error.code != cpr::ErrorCode::OK)
+                        {
+                            std::string Err = "Request failed: " + Response.error.message;
+                            lua_pushstring(L, Err.c_str());
+                            return 1;
+                        }
+
+                        lua_newtable(L);
+                        lua_pushboolean(L, Response.status_code >= 200 && Response.status_code < 300);
+                        lua_setfield(L, -2, "Success");
+
+                        lua_pushinteger(L, Response.status_code);
+                        lua_setfield(L, -2, "StatusCode");
+
+                        std::string Phrase;
+                        switch (Response.status_code)
+                        {
+                        case 100: Phrase = "Continue"; break;
+                        case 101: Phrase = "Switching Protocols"; break;
+                        case 102: Phrase = "Processing"; break;
+                        case 103: Phrase = "Early Hints"; break;
+
+                        case 200: Phrase = "OK"; break;
+                        case 201: Phrase = "Created"; break;
+                        case 202: Phrase = "Accepted"; break;
+                        case 203: Phrase = "Non-Authoritative Information"; break;
+                        case 204: Phrase = "No Content"; break;
+                        case 205: Phrase = "Reset Content"; break;
+                        case 206: Phrase = "Partial Content"; break;
+                        case 207: Phrase = "Multi-Status"; break;
+                        case 208: Phrase = "Already Reported"; break;
+                        case 226: Phrase = "IM Used"; break;
+
+                        case 300: Phrase = "Multiple Choices"; break;
+                        case 301: Phrase = "Moved Permanently"; break;
+                        case 302: Phrase = "Found"; break;
+                        case 303: Phrase = "See Other"; break;
+                        case 304: Phrase = "Not Modified"; break;
+                        case 305: Phrase = "Use Proxy"; break;
+                        case 307: Phrase = "Temporary Redirect"; break;
+                        case 308: Phrase = "Permanent Redirect"; break;
+
+                        case 400: Phrase = "Bad Request"; break;
+                        case 401: Phrase = "Unauthorized"; break;
+                        case 402: Phrase = "Payment Required"; break;
+                        case 403: Phrase = "Forbidden"; break;
+                        case 404: Phrase = "Not Found"; break;
+                        case 405: Phrase = "Method Not Allowed"; break;
+                        case 406: Phrase = "Not Acceptable"; break;
+                        case 407: Phrase = "Proxy Authentication Required"; break;
+                        case 408: Phrase = "Request Timeout"; break;
+                        case 409: Phrase = "Conflict"; break;
+                        case 410: Phrase = "Gone"; break;
+                        case 411: Phrase = "Length Required"; break;
+                        case 412: Phrase = "Precondition Failed"; break;
+                        case 413: Phrase = "Payload Too Large"; break;
+                        case 414: Phrase = "URI Too Long"; break;
+                        case 415: Phrase = "Unsupported Media Type"; break;
+                        case 416: Phrase = "Range Not Satisfiable"; break;
+                        case 417: Phrase = "Expectation Failed"; break;
+                        case 418: Phrase = "I'm a teapot"; break;
+                        case 422: Phrase = "Unprocessable Entity"; break;
+                        case 423: Phrase = "Locked"; break;
+                        case 424: Phrase = "Failed Dependency"; break;
+                        case 426: Phrase = "Upgrade Required"; break;
+                        case 428: Phrase = "Precondition Required"; break;
+                        case 429: Phrase = "Too Many Requests"; break;
+                        case 431: Phrase = "Request Header Fields Too Large"; break;
+                        case 451: Phrase = "Unavailable For Legal Reasons"; break;
+
+                        case 500: Phrase = "Internal Server Error"; break;
+                        case 501: Phrase = "Not Implemented"; break;
+                        case 502: Phrase = "Bad Gateway"; break;
+                        case 503: Phrase = "Service Unavailable"; break;
+                        case 504: Phrase = "Gateway Time-out"; break;
+                        case 505: Phrase = "HTTP Version Not Supported"; break;
+                        case 506: Phrase = "Variant Also Negotiates"; break;
+                        case 507: Phrase = "Insufficient Storage"; break;
+                        case 508: Phrase = "Loop Detected"; break;
+                        case 510: Phrase = "Not Extended"; break;
+                        case 511: Phrase = "Network Authentication Required"; break;
+
+                        default: Phrase = std::string(); break;
+                        }
+                        lua_pushstring(L, Phrase.c_str());
+                        lua_setfield(L, -2, "StatusMessage");
+
+                        lua_newtable(L);
+                        for (auto& Header : Response.header)
+                        {
+                            lua_pushstring(L, Header.first.c_str());
+                            lua_pushstring(L, Header.second.c_str());
+                            lua_settable(L, -3);
+                        }
+                        lua_setfield(L, -2, "Headers");
+
+                        lua_newtable(L);
+                        for (auto& C : Response.cookies.map_)
+                        {
+                            lua_pushstring(L, C.first.c_str());
+                            lua_pushstring(L, C.second.c_str());
+                            lua_settable(L, -3);
+                        }
+                        lua_setfield(L, -2, "Cookies");
+
+                        lua_pushlstring(L, Response.text.data(), Response.text.size());
+                        lua_setfield(L, -2, "Body");
+
+                        return 1;
+                    };
+            });
     }
 
     void c_http::register_library(lua_State* L)
     {
-        utils.add_function(L, "HttpGet", c_http::http_get);
-        utils.add_function(L, "HttpGetAsync", c_http::http_get);
-        utils.add_function(L, "HttpPost", c_http::http_post);
-        utils.add_function(L, "HttpPostAsync", c_http::http_post);
-        utils.add_function(L, "request", c_http::request);
+        utils.add_function(L, "HttpGet",      c_http::http_get);
+        utils.add_function(L, "request",      c_http::request);
         utils.add_function(L, "http_request", c_http::request);
 
         lua_newtable(L);
         utils.add_table_function(L, "request", c_http::request);
-        lua_setreadonly(L, -1, true);
         lua_setglobal(L, "http");
     }
 }
