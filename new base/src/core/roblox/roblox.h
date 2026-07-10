@@ -9,9 +9,9 @@
 #include <encs.h>
 
 // dumped by sc(@k1ci0)
-// took 93860ms (93.86s)
+// took 97879ms (97.879s)
 
-// roblox version: version-90f2fddd3b244ff6
+// roblox version: version-36a2600cebf1487d
 // yes i steal this design from 'vylkyrie'
 
 template <typename T>
@@ -37,8 +37,7 @@ public:
 struct lua_State;
 struct YieldState;
 struct YieldingLuaThread;
-
-namespace module::update{
+namespace module::update {
     using luac_function_t = std::int32_t(*)(lua_State* lua_state);
 
     template <typename T>
@@ -55,33 +54,33 @@ namespace module::update{
         enum message_type_t : std::int32_t { basic, info, warn, error };
         using rbx_print_t = void(__fastcall*)(message_type_t message_type, const char* format, ...);
 
-        const auto print = rebase<rbx_print_t>(0x46d3410);
+        const auto print = rebase<rbx_print_t>(0x8273f0);
     };
 
     namespace luau {
         using luau_execute_t = void(__fastcall*)(lua_State* lua_state);
         using luad_throw_t = void(__fastcall*)(lua_State*, std::int32_t);
         using lua_vm_load_t = std::int32_t(__fastcall*)(lua_State*, std::string*, const char*, std::int32_t);
-        using get_lua_state_for_instance_t = lua_State * (__fastcall*)(std::uintptr_t, std::uintptr_t*, std::uintptr_t*);
+        using get_lua_state_for_instance_t = lua_State*(__fastcall*)(std::uintptr_t, std::uintptr_t*, std::uintptr_t*);
         using get_values_t = void(__fastcall*)(lua_State*, std::int32_t, void*, bool, std::int32_t);
         using disconnect_connection_t = void(__fastcall*)(std::uintptr_t*);
 
-        const auto luao_nilobject = rebase<std::uintptr_t>(0x69ea5f0);
-        const auto luah_dummynode = rebase<std::uintptr_t>(0x69ea498);
+        const auto luao_nilobject = rebase<std::uintptr_t>(0x5e490d0);
+        const auto luah_dummynode = rebase<std::uintptr_t>(0x5e47d00);
 
-        const auto luau_execute = rebase<luau_execute_t>(0x4768ad0);
-        const auto luad_throw = rebase<luad_throw_t>(0x47562a0);
-        const auto task_defer = rebase<luac_function_t>(0x1e5fb80);
+        const auto luau_execute = rebase<luau_execute_t>(0x415cdf8);
+        const auto luad_throw = rebase<luad_throw_t>(0x7e0b30);
+        const auto task_defer = rebase<luac_function_t>(0x1f76270);
 
-        const auto lua_vm_load = rebase<lua_vm_load_t>(0x1d33ba0);
-        const auto opcode_lookup_table = rebase<std::uintptr_t>(0x627d4d0);
-        const auto get_lua_state_for_instance = rebase<get_lua_state_for_instance_t>(0x1d1b2f0);
+        const auto lua_vm_load = rebase<lua_vm_load_t>(0x1e63cd0);
+        const auto opcode_lookup_table = rebase<std::uintptr_t>(0x5e47f90);
+        const auto get_lua_state_for_instance = rebase<get_lua_state_for_instance_t>(0x1e456b0);
 
-        const auto get_values = rebase<get_values_t>(0x1da2610);
+        const auto get_values = rebase<get_values_t>(0x2cd8c20);
 
-        const auto rbx_crash_log = rebase<std::uintptr_t>(0x4abae00);
+        const auto rbx_crash_log = rebase<std::uintptr_t>(0x278c8e0);
 
-        const auto disconnect_connection = rebase<disconnect_connection_t>(0x1d22990);
+        const auto disconnect_connection = rebase<disconnect_connection_t>(0x1e6c090);
     };
 
     namespace data_model {
@@ -91,11 +90,11 @@ namespace module::update{
         static auto script_context = offset_t<std::uintptr_t>(0x440);
         static auto fake_dm_to_real_dm = offset_t<std::uintptr_t>(0x1d0);
 
-        const auto fake_dm_pointer = rebase<std::uintptr_t>(0x7cb3d78);
+        const auto fake_dm_pointer = rebase<std::uintptr_t>(0x84a9e98);
     };
 
     namespace visual_engine {
-        const auto pointer = rebase<std::uintptr_t>(0x83d1f98);
+        const auto pointer = rebase<std::uintptr_t>(0x81d61c8);
         static auto render_view = offset_t<std::uintptr_t>(0x0); /* not found */
         static auto view_matrix = offset_t<std::uintptr_t>(0x150);
         static auto dimensions = offset_t<std::uintptr_t>(0x0); /* not found */
@@ -138,7 +137,7 @@ namespace module::update{
 
     namespace task_scheduler {
         const auto raw = rebase<std::uintptr_t>(0x0); /* not found */
-        const auto pointer = rebase<std::uintptr_t>(0x8244248);
+        const auto pointer = rebase<std::uintptr_t>(0x8041ec8);
 
         static auto job_start = offset_t<std::uintptr_t>(0xc8);
         static auto job_end = offset_t<std::uintptr_t>(0xd0);
@@ -150,11 +149,11 @@ namespace module::update{
         using get_capabilities_t = std::uintptr_t(__fastcall*)(std::uintptr_t);
         using attach_roblox_extra_space_t = std::uintptr_t(__fastcall*)(std::uintptr_t, std::uintptr_t, std::uintptr_t*, std::uintptr_t);
 
-        const auto get_capabilities = rebase<get_capabilities_t>(0x47b6b40);
+        const auto get_capabilities = rebase<get_capabilities_t>(0x789c90);
         const auto get_identity_struct = rebase<get_identity_struct_t>(0x7ee0);
-        const auto impersonator = rebase<impersonator_t>(0x1cfb7e0);
-        const auto identity_pointer = rebase<std::uintptr_t>(0x82352d0);
-        const auto attach = rebase<attach_roblox_extra_space_t>(0x1d4a2c0);
+        const auto impersonator = rebase<impersonator_t>(0x1e3a7a0);
+        const auto identity_pointer = rebase<std::uintptr_t>(0x7da22b8);
+        const auto attach = rebase<attach_roblox_extra_space_t>(0x1ee7cb0);
 
         static auto require_bypass = offset_t<std::uintptr_t>(0x0); /* not found */
     };
@@ -169,9 +168,9 @@ namespace module::update{
 
     namespace script {
         namespace module_script {
-            using get_from_vmstate_map_t = std::uintptr_t* (__fastcall*)(std::uintptr_t* vmstate_list, std::uintptr_t* vmstate, lua_State** main_thread);
+            using get_from_vmstate_map_t = std::uintptr_t*(__fastcall*)(std::uintptr_t* vmstate_list, std::uintptr_t* vmstate, lua_State** main_thread);
 
-            const auto get_from_vmstate_map = rebase<get_from_vmstate_map_t>(0x1d48360);
+            const auto get_from_vmstate_map = rebase<get_from_vmstate_map_t>(0x1ee5da0);
         };
     };
 
@@ -184,19 +183,19 @@ namespace module::update{
         using push_instance_void_ptr2_t = void(__fastcall*)(lua_State*, void*);
         using push_instance_weak_t = void(__fastcall*)(lua_State*, std::weak_ptr<std::uintptr_t>);
 
-        const auto shared = rebase<push_instance_shared_ptr_t>(0x1d0e240);
-        const auto weak = rebase<push_instance_weak_ptr_t>(0x1d0e240);
-        const auto weak_uptr = rebase<push_instance_weak_t>(0x1d0e240);
-        const auto uint_ptr = rebase<push_instance_uint_ptr_t>(0x1d0e240);
-        const auto void_ptr = rebase<push_instance_void_ptr_t>(0x1d0e240);
-        const auto void_ptr2 = rebase<push_instance_void_ptr2_t>(0x1d0e240);
+        const auto shared = rebase<push_instance_shared_ptr_t>(0x1e59750);
+        const auto weak = rebase<push_instance_weak_ptr_t>(0x1e59750);
+        const auto weak_uptr = rebase<push_instance_weak_t>(0x1e59750);
+        const auto uint_ptr = rebase<push_instance_uint_ptr_t>(0x1e59750);
+        const auto void_ptr = rebase<push_instance_void_ptr_t>(0x1e59750);
+        const auto void_ptr2 = rebase<push_instance_void_ptr2_t>(0x1e59750);
     };
 
     namespace class_descriptor {
-        using get_property_t = std::uintptr_t* (__thiscall*)(std::uintptr_t, std::uintptr_t*);
+        using get_property_t = std::uintptr_t*(__thiscall*)(std::uintptr_t, std::uintptr_t*);
 
-        const auto ktable = rebase<std::uintptr_t*>(0x8245c20);
-        const auto get_property = rebase<get_property_t>(0xc97040);
+        const auto ktable = rebase<std::uintptr_t*>(0x804ab10);
+        const auto get_property = rebase<get_property_t>(0x1e4e450);
 
         static auto gp_hashmap_offset = offset_t<std::uintptr_t>(0x250);
         static auto gp_bucket_idx_offset = offset_t<std::uintptr_t>(0x258);
@@ -212,59 +211,59 @@ namespace module::update{
         using handle_connection_state_t = void(__fastcall*)(std::uintptr_t, char*, std::int32_t, std::uint8_t*, char);
         using raknet_send_t = __int64(__fastcall*)(__int64, const void*, int, int, int, char, __int64*, char, int, int, char, __int64);
 
-        const auto process_network_packet = rebase<process_network_packet_t>(0x31b0e50);
-        const auto send = rebase<raknet_send_t>(0x31b1cb0);
-        const auto report_network_error = rebase<report_network_error_t>(0xa4fee0);
-        const auto handle_connection_state = rebase<handle_connection_state_t>(0xa5b530);
+        const auto process_network_packet = rebase<process_network_packet_t>(0x408e840);
+        const auto send = rebase<raknet_send_t>(0x408f6a0);
+        const auto report_network_error = rebase<report_network_error_t>(0x24055b0);
+        const auto handle_connection_state = rebase<handle_connection_state_t>(0x24107b0);
     };
 
     namespace flags {
-        const auto enable_load_module = rebase<std::uintptr_t>(0x7dcb160);
-        const auto lock_violation_instance_crash = rebase<std::uintptr_t>(0x7dc5f48);
-        const auto lock_violation_script_crash = rebase<std::uintptr_t>(0x7dc8248);
-        const auto wnd_process_check = rebase<std::uintptr_t>(0x7857008);
-        const auto lua_step_interval_ms_override_enabled = rebase<std::uintptr_t>(0x7dca218);
-        const auto get_fast_flag = rebase<std::uintptr_t>(0x53a1860);
+        const auto enable_load_module = rebase<std::uintptr_t>(0x83440e0);
+        const auto lock_violation_instance_crash = rebase<std::uintptr_t>(0x849cd00);
+        const auto lock_violation_script_crash = rebase<std::uintptr_t>(0x8340468);
+        const auto wnd_process_check = rebase<std::uintptr_t>(0x7941b90);
+        const auto lua_step_interval_ms_override_enabled = rebase<std::uintptr_t>(0x8340df0);
+        const auto get_fast_flag = rebase<std::uintptr_t>(0x3660950);
         const auto set_fast_flag = rebase<std::uintptr_t>(0x0); /* not found */
-        const auto task_scheduler_target_fps = rebase<std::uintptr_t>(0x49dfac0);
+        const auto task_scheduler_target_fps = rebase<std::uintptr_t>(0xcaa720);
     };
 
     namespace signals {
-        using fireproximityprompt_t = std::uintptr_t* (__thiscall*)(std::uintptr_t);
+        using fireproximityprompt_t = std::uintptr_t*(__thiscall*)(std::uintptr_t);
         using fire_mouse_click_t = void(__fastcall*)(__int64, float, __int64);
         using fire_hover_t = void(__fastcall*)(__int64, __int64);
         using firetouchinterest_t = void(__fastcall*)(std::uintptr_t, std::uintptr_t, std::uintptr_t, bool, bool);
         using cast_to_variant_t = std::uintptr_t(__fastcall*)(lua_State*, int, void*, bool, int);
 
-        const auto cast_to_variant = rebase<cast_to_variant_t>(0x1cfcefb);
+        const auto cast_to_variant = rebase<cast_to_variant_t>(0x2cd8c20);
         const auto fire_mouse_click = rebase<fire_mouse_click_t>(0x0); /* not found */
         const auto fire_right_mouse_click = rebase<fire_mouse_click_t>(0x0); /* not found */
         const auto fire_mouse_hover_enter = rebase<fire_hover_t>(0x0); /* not found */
         const auto fire_mouse_hover_leave = rebase<fire_hover_t>(0x0); /* not found */
-        const auto fire_proximity_prompt = rebase<fireproximityprompt_t>(0x268c9d0);
-        const auto fire_touch_interest = rebase<firetouchinterest_t>(0x2aa23b0);
+        const auto fire_proximity_prompt = rebase<fireproximityprompt_t>(0x4b45c00);
+        const auto fire_touch_interest = rebase<firetouchinterest_t>(0x1b231c0);
     };
 
     namespace functions {
-        const auto task_spawn = rebase<luac_function_t>(0x1e60a60);
-        const auto task_delay = rebase<luac_function_t>(0x1e5ff70);
-        const auto task_wait = rebase<luac_function_t>(0x1e60de0);
-        const auto task_cancel = rebase<luac_function_t>(0x1e5f870);
-        const auto task_synchronize = rebase<luac_function_t>(0x1e60be0);
-        const auto task_desynchronize = rebase<luac_function_t>(0x1e601c0);
+        const auto task_spawn = rebase<luac_function_t>(0x1f77150);
+        const auto task_delay = rebase<luac_function_t>(0x1f76660);
+        const auto task_wait = rebase<luac_function_t>(0x1f774d0);
+        const auto task_cancel = rebase<luac_function_t>(0x1f75f60);
+        const auto task_synchronize = rebase<luac_function_t>(0x1f772d0);
+        const auto task_desynchronize = rebase<luac_function_t>(0x1f768b0);
 
-        const auto lua_pcall = rebase<std::uintptr_t>(0x4753d60);
+        const auto lua_pcall = rebase<std::uintptr_t>(0x7da3b0);
 
-        const auto get_thread_data = rebase<std::uintptr_t>(0x6deae0);
+        const auto get_thread_data = rebase<std::uintptr_t>(0x725890);
 
-        const auto luaf_freeproto = rebase<std::uintptr_t>(0x47810b0);
-        const auto luac_step = rebase<std::uintptr_t>(0x475aac0);
-        const auto gcstep = rebase<std::uintptr_t>(0x475a5a0);
+        const auto luaf_freeproto = rebase<std::uintptr_t>(0x7ec650);
+        const auto luac_step = rebase<std::uintptr_t>(0x7ee130);
+        const auto gcstep = rebase<std::uintptr_t>(0x7edc10);
     };
 
     namespace hyperion {
-        const auto control_flow_guard = hyperion_rebase<std::uintptr_t>(0xf85bd0);
-        const auto bitmap = hyperion_rebase<std::uintptr_t>(0x1512ca0);
+        const auto control_flow_guard = hyperion_rebase<std::uintptr_t>(0xadd50);
+        const auto bitmap = hyperion_rebase<std::uintptr_t>(0x1487b38);
         static auto byte_shift = offset_t<std::uint32_t>(0xc);
         static auto page_shift = offset_t<std::uint32_t>(0xe0);
         static auto bit_mask = offset_t<std::uint32_t>(0xff);
@@ -273,8 +272,8 @@ namespace module::update{
     namespace appdata {
         using get_appdata_info_t = uintptr_t(__fastcall*)();
 
-        const auto get = rebase<get_appdata_info_t>(0x36d29f0);
-        const auto info = rebase<std::uintptr_t>(0x7f1b3c0);
-        static auto app_status = offset_t<std::int32_t>(0x28); /* can change */
+        const auto get = rebase<get_appdata_info_t>(0x70df60);
+        const auto info = rebase<std::uintptr_t>(0x7d9d120);
+        static auto app_status = offset_t<std::int32_t>(0x160); /* can change */
     };
 }
