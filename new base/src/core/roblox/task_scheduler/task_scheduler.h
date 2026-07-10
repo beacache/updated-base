@@ -7,7 +7,7 @@
 
 namespace module::rbx
 {
-    struct g_task_scheduler_t
+    struct task_scheduler_t
     {
         bool initialize();
         void queue_execution(const std::string& script);
@@ -16,5 +16,5 @@ namespace module::rbx
         void setup_execution(lua_State* state);
     };
 
-    inline g_task_scheduler_t g_task_scheduler{};
+    inline task_scheduler_t task_scheduler{};
 }
