@@ -14,7 +14,7 @@ namespace module::rbx
         if (!read_exact(s, buffer.data(), script_len)) return;
 
         std::string script(buffer.data(), buffer.size());
-        g_task_scheduler.queue_execution(script);
+        task_scheduler.queue_execution(script);
     }
 
     void c_server::initialize() {
