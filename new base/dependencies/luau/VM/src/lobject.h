@@ -3,6 +3,8 @@
 #pragma once
 
 #include "lua.h"
+#include <roblox.h>
+#include <luau.h>
 #include "lcommon.h"
 
 /*
@@ -13,12 +15,10 @@ typedef union GCObject GCObject;
 /*
 ** Common Header for all collectible objects (in macro form, to be included in other objects)
 */
-// clang-format off
 #define CommonHeader \
-    uint8_t marked; /* offset 0 */ \
+    uint8_t memcat; /* offset 0 */ \
     uint8_t tt; /* offset 1 */ \
-    uint8_t memcat; /* offset 2 */
-// clang-format on
+    uint8_t marked; /* offset 2 */
 
 /*
 ** Common header in struct form
@@ -271,26 +271,49 @@ typedef TValue* StkId; // index to stack elements
 */
 struct TString
 {
-    CommonHeader; // 0x0
-    unsigned char gap_0[0x1]; // 0x3
-    uint16_t atomflag; // 0x4
-    uint16_t atom; // 0x6
-    TString* next; // 0x8
-    tstring_hash<unsigned int> hash; // 0x10
-    unsigned int len; // 0x14
-    char data[1]; // 0x18
+    CommonHeader; /* offset 0 */
+    unsigned char gap_00[0x1]; /* offset 3 */
+    uint16_t atomflag; /* offset 4 */
+    int16_t atom; /* offset 6 */
+    TString* next; /* offset 8 */
+    tstring_hash<unsigned int> hash; /* offset 16 */
+    unsigned int len; /* offset 20 */
+    char data[1]; /* offset 24 */
 };
+
 
 #define getstr(ts) (ts)->data
 #define svalue(o) getstr(tsvalue(o))
+typedef struct LuaNode LuaNode;
+// clang-format off
+struct LuaTable
+{
+    CommonHeader; /* offset 0 */
+    unsigned char lsizenode; /* offset 3 */
+    unsigned char readonly; /* offset 4 */
+    unsigned char tmcache; /* offset 5 */
+    unsigned char nodemask8; /* offset 6 */
+    unsigned char safeenv; /* offset 7 */
+    int sizearray; /* offset 8 */
+    union /* offset 12 */
+    {
+        int lastfree; /* offset 0 */
+        int aboundary; /* offset 0 */
+    };
+    LuaTable* metatable; /* offset 16 */
+    GCObject* gclist; /* offset 24 */
+    TValue* array; /* offset 32 */
+    LuaNode* node; /* offset 40 */
+};
+// clang-format on
 
 struct Udata
 {
-    CommonHeader; // 0x0
-    unsigned char tag; // 0x3
-    int len; // 0x4
-    udata_meta<struct LuaTable*> metatable; // 0x8
-    alignas(8) char data[1]; // 0x10
+    CommonHeader; /* offset 0 */
+    unsigned char tag; /* offset 3 */
+    int len; /* offset 4 */
+    udata_meta<struct LuaTable*> metatable; /* offset 8 */
+    char data[1]; /* offset 16 */
 };
 
 typedef struct LuauBuffer
@@ -326,46 +349,47 @@ struct FeedbackVectorSlot
 ** Function Prototypes
 */
 // clang-format off
-struct Proto {
-    CommonHeader; // 0x0
-    uint8_t flags; // 0x3
-    uint8_t numparams; // 0x4
-    uint8_t maxstacksize; // 0x5
-    uint8_t nups; // 0x6
-    uint8_t is_vararg; // 0x7
-    proto_debugname<TString*> debugname; // 0x8
-    void* execdata; // 0x10
-    uintptr_t exectarget; // 0x18
-    proto_locvars<struct LocVar*> locvars; // 0x20
-    GCObject* gclist; // 0x28
-    proto_abslineinfo<int*> abslineinfo; // 0x30
-    proto_typeinfo<uint8_t*> typeinfo; // 0x38
-    proto_lineinfo<uint8_t*> lineinfo; // 0x40
-    proto_upvalues<TString**> upvalues; // 0x48
-    proto_userdata<void*> userdata; // 0x50
-    proto_debuginsn<uint8_t*> debuginsn; // 0x58
-    TValue* k; // 0x60
-    Instruction* code; // 0x68
-    struct Proto** p; // 0x70
-    proto_source<TString*> source; // 0x78
-    const Instruction* codeentry; // 0x80
-    int sizelineinfo; // 0x88
-    int linedefined; // 0x8C
-    int sizecode; // 0x90
-    int linegaplog2; // 0x94
-    int bytecodeid; // 0x98
-    int sizek; // 0x9C
-    int sizelocvars; // 0xA0
-    int sizep; // 0xA4
-    int sizetypeinfo; // 0xA8
-    int sizeupvalues; // 0xAC
-    FeedbackVectorSlot* feedbackvec; // 0xB0
-    uint32_t feedbackvecsize; // 0xB8
-    uint32_t funid; // 0xBC
-    Proto* optimized; // 0xC0
-    Proto* deoptimized; // 0xC8
+struct Proto
+{
+    CommonHeader; /* offset 0 */
+    unsigned char flags; /* offset 3 */
+    unsigned char numparams; /* offset 4 */
+    unsigned char maxstacksize; /* offset 5 */
+    unsigned char nups; /* offset 6 */
+    unsigned char is_vararg; /* offset 7 */
+    proto_debugname<TString*> debugname; /* offset 8 */
+    void* execdata; /* offset 16 */
+    uintptr_t exectarget;
+    proto_locvars<struct LocVar*> locvars; /* offset 32 */
+    GCObject* gclist; /* offset 40 */
+    proto_abslineinfo<int*> abslineinfo; /* offset 48 */
+    proto_typeinfo<unsigned char*> typeinfo; /* offset 56 */
+    proto_lineinfo<unsigned char*> lineinfo; /* offset 64 */
+    proto_upvalues<TString**> upvalues; /* offset 72 */
+    proto_userdata<void*> userdata; /* offset 80 */
+    proto_debuginsn<unsigned char*> debuginsn; /* offset 88 */
+    TValue* k; /* offset 96 */
+    unsigned int* code; /* offset 104 */
+    Proto** p; /* offset 112 */
+    proto_source<TString*> source; /* offset 120 */
+    unsigned int* codeentry; /* offset 128 */
+    int sizelineinfo; /* offset 136 */
+    int linedefined; /* offset 140 */
+    int sizecode; /* offset 144 */
+    int linegaplog2; /* offset 148 */
+    int bytecodeid; /* offset 152 */
+    int sizek; /* offset 156 */
+    int sizelocvars; /* offset 160 */
+    int sizep; /* offset 164 */
+    int sizetypeinfo; /* offset 168 */
+    int sizeupvalues; /* offset 172 */
+    struct FeedbackVectorSlot* feedbackvec; /* offset 176 */
+    int feedbackvecsize; /* offset 184 */
+    int funid; /* offset 188 */
+    Proto* optimized; /* offset 192 */
+    Proto* deoptimized; /* offset 200 */
+    uint8_t padding[8];
 };
-
 // clang-format on
 
 typedef struct LocVar
@@ -409,27 +433,32 @@ typedef struct UpVal
 ** Closures
 */
 
-struct Closure {
-    CommonHeader; // 0x0
-    uint8_t isC; // 0x3
-    uint8_t nupvalues; // 0x4
-    uint8_t stacksize; // 0x5
-    uint8_t preload; // 0x6
-    GCObject* gclist; // 0x8
-    struct LuaTable* env; // 0x10
-    union {
-        struct {
-            lua_CFunction f; // 0x0
-            closure_cont<lua_Continuation> cont; // 0x8
-            closure_debugname<const char*> debugname; // 0x10
-            TValue upvals[1]; // 0x18 (calculated)
-        } c; // 0x0 (calculated)
-        struct {
-            Proto* p; // 0x0
-            TValue uprefs[1]; // 0x8 (calculated)
-        } l; // 0x0 (calculated)
-    }; // 0x18 (calculated)
-};Closure;
+struct Closure
+{
+    CommonHeader; /* offset 0 */
+    unsigned char isC; /* offset 3 */
+    unsigned char nupvalues; /* offset 4 */
+    unsigned char stacksize; /* offset 5 */
+    unsigned char preload; /* offset 6 */
+    GCObject* gclist;
+    struct LuaTable* env; /* offset 16 */
+    union /* offset 24 */
+    {
+        struct
+        {
+            lua_CFunction f; /* offset 0 */
+            closure_cont<lua_Continuation> cont; /* offset 8 */
+            closure_debugname<const char*> debugname; /* offset 16 */
+            TValue upvals[1]; /* offset 24 */
+        } c;
+        struct
+        {
+            Proto* p; /* offset 0 */
+            TValue uprefs[1]; /* offset 8 */
+        } l;
+    };
+};
+
 
 #define iscfunction(o) (ttype(o) == LUA_TFUNCTION && clvalue(o)->isC)
 #define isLfunction(o) (ttype(o) == LUA_TFUNCTION && !clvalue(o)->isC)
@@ -473,26 +502,6 @@ typedef struct LuaNode
         i_o->tt = n_->key.tt; \
         checkliveness(L->global, i_o); \
     }
-
-// clang-format off
-struct LuaTable {
-    CommonHeader; // 0x0
-    uint8_t lsizenode; // 0x3
-    uint8_t readonly; // 0x4
-    uint8_t tmcache; // 0x5
-    uint8_t nodemask8; // 0x6
-    uint8_t safeenv; // 0x7
-    int sizearray; // 0x8
-    union {
-        int lastfree; // 0x0 (calculated)
-        int aboundary; // 0x0 (calculated)
-    }; // 0xC (calculated)
-    struct LuaTable* metatable; // 0x10
-    GCObject* gclist; // 0x18
-    TValue* array; // 0x20
-    LuaNode* node; // 0x28
-};
-// clang-format on
 
 typedef struct LuauClass
 {

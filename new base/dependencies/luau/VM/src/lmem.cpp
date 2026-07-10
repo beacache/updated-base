@@ -206,7 +206,8 @@ const SizeClassConfig kSizeClassConfig;
 #define debugpageset(x) NULL
 #endif
 
-struct lua_Page {
+struct lua_Page
+{
     lua_Page* listprev; // 0x0
     lua_Page* listnext; // 0x8
     lua_Page* prev; // 0x10

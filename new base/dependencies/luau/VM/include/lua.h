@@ -3,36 +3,35 @@
 #pragma once
 
 #include <stdarg.h>
+#include <memory>
 #include <stddef.h>
 #include <stdint.h>
 
 #include "luaconf.h"
-#include <memory>
-
-#include <roblox.h>
-#include <luau.h>
-
 #define lua_normalisestack(L, mxs) { if (lua_gettop(L) > mxs) lua_settop(L, mxs); }
 
-struct Shared
-{
-    unsigned char gap_00[0x10];
-    uint64_t scriptContext; /* 0x10 */
-};
 
-struct RobloxExtraSpace
-{
-    RobloxExtraSpace* next; // 0x0
-    uintptr_t _container; // 0x8
-    RobloxExtraSpace* prev; // 0x10
-    std::shared_ptr<Shared> shared; // 0x18
-    std::weak_ptr<uintptr_t> actor; // 0x58
-    uint64_t capabilities;          // 0x68 
-    uint64_t identity;              // 0x88
-    std::weak_ptr<uintptr_t> source;   // 0x78
-};
 
 // option for multiple returns in `lua_pcall' and `lua_call'
+
+    struct Shared
+    {
+        unsigned char gap_00[0x10]; /* offset 0 */
+        void* scriptContext; /* offset 16 */
+        unsigned char gap_01[0x10]; /* offset 24 */
+    };
+
+    struct RobloxExtraSpace
+    {
+        unsigned char gap_00[0x18]; /* offset 0 */
+        std::shared_ptr<Shared> shared; /* offset 24 */
+        unsigned char gap_01[0x40]; /* offset 40 */
+        uint64_t capabilities; /* offset 104 */
+        unsigned char gap_02[0x8]; /* offset 112 */
+        std::weak_ptr<uintptr_t> source; // offset 120
+        uint64_t identity; /* offset 136 */
+    };
+
 #define LUA_MULTRET (-1)
 
 /*
@@ -274,7 +273,7 @@ LUA_API int lua_resumeerror(lua_State* L, lua_State* from);
 LUA_API int lua_status(lua_State* L);
 LUA_API int lua_isyieldable(lua_State* L);
 LUA_API void* lua_getthreaddata(lua_State* L);
-LUA_API void lua_setthreaddata(lua_State* L, void* data);
+LUA_API void lua_setthreaddata(lua_State* L, RobloxExtraSpace* data);
 LUA_API int lua_costatus(lua_State* L, lua_State* co);
 
 /*
@@ -509,19 +508,18 @@ LUA_API const char* lua_debugtrace(lua_State* L);
 
 struct lua_Debug
 {
-    unsigned char isvararg;         // 0x00
-    unsigned char nparams;          // 0x01
-    unsigned char nupvals;          // 0x02
-    unsigned char gap_00[0x1];      // 0x03
-    int linedefined;                // 0x04
-    int currentline;                // 0x08
-    unsigned char gap_01[0x4];      // 0x0C
-    const char* source;             // 0x10
-    const char* short_src;          // 0x18
-    const char* name;               // 0x20
-    const char* what;               // 0x28
-    void* userdata;                 // 0x30
-    char ssbuf[LUA_IDSIZE];         // 0x38
+    void* userdata; /* offset 0 */
+    int linedefined; /* offset 8 */
+    int currentline; /* offset 12 */
+    unsigned char nupvals; /* offset 16 */
+    unsigned char isvararg; /* offset 17 */
+    unsigned char nparams; /* offset 18 */
+    unsigned char gap_00[0x5]; /* offset 19 */
+    const char* name; /* offset 24 */
+    const char* short_src; /* offset 32 */
+    const char* source; /* offset 40 */
+    const char* what; /* offset 48 */
+    char ssbuf[256]; /* offset 56 */
 };
 
 // }======================================================================
@@ -531,18 +529,20 @@ struct lua_Debug
  *
  * Note: interrupt is safe to set from an arbitrary thread but all other callbacks
  * can only be changed when the VM is not running any code */
-struct lua_Callbacks {
-    void* userdata; // 0x0
-    void (*debugbreak)(lua_State* L, lua_Debug* ar); // 0x8 (calculated)
-    int16_t(*useratom)(lua_State* L, const char* s, size_t l); // 0x10
-    void (*debugstep)(lua_State* L, lua_Debug* ar); // 0x18 (calculated)
-    void (*debuginterrupt)(lua_State* L, lua_Debug* ar); // 0x20 (calculated)
-    void (*interrupt)(lua_State* L, int gc); // 0x28
-    void (*onallocate)(lua_State* L, size_t osize, size_t nsize); // 0x30
-    void (*userthread)(lua_State* LP, lua_State* L); // 0x38
-    void (*debugprotectederror)(lua_State* L); // 0x40
-    void (*panic)(lua_State* L, int errcode); // 0x48 (calculated)
-};
+typedef struct lua_Callbacks
+{
+    void* userdata; /* offset 0 */
+    void (*debugbreak)(lua_State* L, lua_Debug* ar); /* offset 8 */
+    int16_t(*useratom)(lua_State* L, const char* s, size_t l); /* offset 16 */
+    void (*debugstep)(lua_State* L, lua_Debug* ar); /* offset 24 */
+    void (*debuginterrupt)(lua_State* L, lua_Debug* ar); /* offset 32 */
+    void (*interrupt)(lua_State* L, int gc); /* offset 40 */
+    void (*onallocate)(lua_State* L, size_t osize, size_t nsize); /* offset 48 */
+    void (*userthread)(lua_State* LP, lua_State* L); /* offset 56 */
+    void (*debugprotectederror)(lua_State* L); /* offset 64 */
+    void (*panic)(lua_State* L, int errcode); /* offset 72 */
+} lua_Callbacks;
+
 typedef struct lua_Callbacks lua_Callbacks;
 
 LUA_API lua_Callbacks* lua_callbacks(lua_State* L);

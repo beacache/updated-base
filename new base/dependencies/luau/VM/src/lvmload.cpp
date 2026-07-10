@@ -16,20 +16,6 @@
 
 #include <string.h>
 
-#include <windows.h>
-static void debug_log_load(const char* msg) {
-    HANDLE hFile = CreateFileA("C:\\Users\\Trong\\Desktop\\crash_log.txt",
-                               FILE_APPEND_DATA, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
-                               OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-    if (hFile != INVALID_HANDLE_VALUE) {
-        DWORD bytesWritten;
-        WriteFile(hFile, msg, strlen(msg), &bytesWritten, NULL);
-        WriteFile(hFile, "\n", 1, &bytesWritten, NULL);
-        CloseHandle(hFile);
-    }
-}
-#define LOAD_LOG(msg) debug_log_load(msg)
-
 LUAU_FASTFLAGVARIABLE(LuauUdataDirectAccess6)
 LUAU_FASTFLAG(LuauCallFeedback)
 
@@ -298,7 +284,6 @@ static int loadsafe(
 )
 {
     size_t offset = 0;
-    LOAD_LOG("loadsafe: started");
 
     uint8_t version = read<uint8_t>(data, size, offset);
 
@@ -309,7 +294,6 @@ static int loadsafe(
         char chunkbuf[LUA_IDSIZE];
         const char* chunkid = luaO_chunkid(chunkbuf, sizeof(chunkbuf), chunkname, strlen(chunkname));
         lua_pushfstring(L, "%s%.*s", chunkid, int(size - offset), data + offset);
-        LOAD_LOG("loadsafe: version == 0 error");
         return 1;
     }
 
@@ -318,7 +302,6 @@ static int loadsafe(
         char chunkbuf[LUA_IDSIZE];
         const char* chunkid = luaO_chunkid(chunkbuf, sizeof(chunkbuf), chunkname, strlen(chunkname));
         lua_pushfstring(L, "%s: bytecode version mismatch (expected [%d..%d], got %d)", chunkid, LBC_VERSION_MIN, LBC_VERSION_MAX, version);
-        LOAD_LOG("loadsafe: version mismatch");
         return 1;
     }
 
@@ -335,7 +318,6 @@ static int loadsafe(
             lua_pushfstring(
                 L, "%s: bytecode type version mismatch (expected [%d..%d], got %d)", chunkid, LBC_TYPE_VERSION_MIN, LBC_TYPE_VERSION_MAX, typesversion
             );
-            LOAD_LOG("loadsafe: typesversion mismatch");
             return 1;
         }
     }
@@ -346,7 +328,6 @@ static int loadsafe(
     TString* source = luaS_new(L, chunkname);
 
     // string table
-    LOAD_LOG("loadsafe: reading string table");
     unsigned int stringCount = readVarInt(data, size, offset);
     strings.allocate(L, stringCount);
 
@@ -384,7 +365,6 @@ static int loadsafe(
     }
 
     // proto table
-    LOAD_LOG("loadsafe: reading proto table");
     unsigned int protoCount = readVarInt(data, size, offset);
     protos.allocate(L, protoCount);
 
@@ -776,7 +756,6 @@ static int loadsafe(
     }
 
     // "main" proto is pushed to Lua stack
-    LOAD_LOG("loadsafe: setting main proto");
     uint32_t mainid = readVarInt(data, size, offset);
     Proto* main = protos[mainid];
 
@@ -786,7 +765,6 @@ static int loadsafe(
     setclvalue(L, L->top, cl);
     incr_top(L);
 
-    LOAD_LOG("loadsafe: done");
     return 0;
 }
 

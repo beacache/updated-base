@@ -395,11 +395,11 @@ static void traverseproto(global_State* g, Proto* f)
         if (f->locvars[i].varname)
             stringmark(f->locvars[i].varname);
     }
-    // if (f->optimized)
-    //     markobject(g, f->optimized);
+    if (f->optimized)
+        markobject(g, f->optimized);
 
-    // if (f->deoptimized)
-    //     markobject(g, f->deoptimized);
+    if (f->deoptimized)
+        markobject(g, f->deoptimized);
 }
 
 static void traverseclosure(global_State* g, Closure* cl)

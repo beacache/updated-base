@@ -1474,7 +1474,7 @@ struct Compiler
 
         for (const Capture& c : captures)
         {
-            bytecode.emitABC(LOP_CAPTURE, uint8_t(c.type), c.data, c.type == LCT_REF ? 0xFF : 0);
+            bytecode.emitABC(LOP_CAPTURE, uint8_t(c.type), c.data, 0);
         }
     }
 

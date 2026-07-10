@@ -25,6 +25,7 @@
 
 #include "ltable.h"
 
+#include <roblox.h>
 #include "lstate.h"
 #include "ldebug.h"
 #include "lgc.h"

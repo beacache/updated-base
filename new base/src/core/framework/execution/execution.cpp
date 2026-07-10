@@ -17,7 +17,7 @@ namespace module::rbx
             return;
 
         luaL_sandboxthread(thread);
-        g_task_scheduler.set_capabilities(thread, 8, globals.max_capabilities);
+        task_scheduler.set_capabilities(thread, 8, globals.max_capabilities);
 
         std::string bc = globals.compile_src(src);
         if (bc.empty())
@@ -35,7 +35,7 @@ namespace module::rbx
         if (!cl)
             return;
 
-        g_task_scheduler.set_capabilities(cl->l.p, &globals.max_capabilities);
+        task_scheduler.set_capabilities(cl->l.p, &globals.max_capabilities);
 
         lua_getglobal(thread, "task");
         if (lua_type(thread, -1) == LUA_TNIL)

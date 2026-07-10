@@ -75,6 +75,7 @@ const char* luau_ident = "$Luau: Copyright (C) 2019-2024 Roblox Corporation $\n"
         L->top = p; \
     }
 
+
 static LuaTable* getcurrenv(lua_State* L)
 {
     if (L->ci == L->base_ci) // no enclosing function?
@@ -135,6 +136,12 @@ const TValue* luaA_toobject(lua_State* L, int idx)
 {
     StkId p = index2addr(L, idx);
     return (p == luaO_nilobject) ? NULL : p;
+}
+
+void luaA_pushobject(lua_State* L, const TValue* o)
+{
+    setobj2s(L, L->top, o);
+    api_incr_top(L);
 }
 
 void luaA_pushvalue(lua_State* L, const TValue* o)
@@ -1238,9 +1245,9 @@ void* lua_getthreaddata(lua_State* L)
     return L->userdata;
 }
 
-void lua_setthreaddata(lua_State* L, void* data)
+void lua_setthreaddata(lua_State* L, RobloxExtraSpace* data)
 {
-    L->userdata = reinterpret_cast<RobloxExtraSpace*>(data);
+    L->userdata = data;
 }
 
 /*

@@ -1,6 +1,7 @@
 #include <hooks/hooks.h>
 #include <http/http.h>
 #include <miscellaneous/miscellaneous.h>
+#include <unordered_set>
 
 lua_CFunction original_index = nullptr;
 lua_CFunction original_namecall = nullptr;
@@ -115,11 +116,6 @@ int index_hook(lua_State* L)
             lua_pushcclosure(L, module::core::environment::http.http_get, nullptr, NULL);
             return 1;
         }
-        else if (key == "HttpPost" || key == "HttpPostAsync")
-        {
-            lua_pushcclosure(L, module::core::environment::http.http_post, nullptr, NULL);
-            return 1;
-        }
         else if (key == "GetObjects" || key == "GetObjectsAsync")
         {
             lua_pushcclosure(L, module::core::environment::miscellaneous.get_objects, nullptr, NULL);
@@ -160,8 +156,6 @@ int namecall_hook(lua_State* L)
     {
         if (key == "HttpGet" || key == "HttpGetAsync")
             return module::core::environment::http.http_get(L);
-        else if (key == "HttpPost" || key == "HttpPostAsync")
-            return module::core::environment::http.http_post(L);
         else if (key == "GetObjects" || key == "GetObjectsAsync")
             return module::core::environment::miscellaneous.get_objects(L);
     }
