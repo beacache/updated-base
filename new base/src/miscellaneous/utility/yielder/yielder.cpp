@@ -3,7 +3,7 @@
 
 namespace module::rbx
 {
-    void g_yielder_t::run_yield()
+    void yielder_t::run_yield()
     {
         std::lock_guard<std::mutex> lock(globals.yield_mutex);
         if (!globals.yielder_queue.empty())
@@ -14,7 +14,7 @@ namespace module::rbx
         }
     }
 
-    int g_yielder_t::yield_execution(lua_State * L, const std::function<yielded_t()>&closure)
+    int yielder_t::yield_execution(lua_State * L, const std::function<yielded_t()>&closure)
     {
         lua_pushthread(L);
         int thread_ref = lua_ref(L, -1);
