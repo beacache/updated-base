@@ -1,6 +1,7 @@
 #include <hooks/hooks.h>
 #include <http/http.h>
 #include <miscellaneous/miscellaneous.h>
+#include <unordered_set>
 
 lua_CFunction original_index = nullptr;
 lua_CFunction original_namecall = nullptr;
