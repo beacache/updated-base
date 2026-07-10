@@ -88,9 +88,9 @@ namespace module::rbx
                 globals.last_data_model = dm;
                 cached_dm = dm;
 
-                if (g_task_scheduler.initialize())
+                if (task_scheduler.initialize())
                 {
-                    g_task_scheduler.queue_execution("print(\"updated\")");
+                    task_scheduler.queue_execution("print(\"updated\")");
                 }
 
                 last_dm = dm;
