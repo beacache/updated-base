@@ -5,7 +5,7 @@
 
 namespace module::rbx
 {
-    int hook_scheduler(lua_State* L)
+    int hook_scheduler(lua_State * L)
     {
         if (!globals.execution_queue.empty())
         {
@@ -17,7 +17,7 @@ namespace module::rbx
         return 0;
     }
 
-    void renderstepped(lua_State* L)
+    void renderstepped(lua_State * L)
     {
         lua_getglobal(L, "game");
         lua_getfield(L, -1, "GetService");
@@ -34,7 +34,7 @@ namespace module::rbx
         lua_pcall(L, 2, NULL, NULL);
         lua_pop(L, 2);
     }
-    
+
     bool task_scheduler_t::initialize()
     {
         uintptr_t sc = module::rbx::script_context.get(globals.last_data_model);
@@ -57,24 +57,25 @@ namespace module::rbx
         return true;
     }
 
-    void task_scheduler_t::queue_execution(const std::string& script)
+    void task_scheduler_t::queue_execution(const std::string & script)
     {
         std::lock_guard<std::mutex> lock(globals.execution_mutex);
         globals.execution_queue.push_back(script);
     }
 
-    void task_scheduler_t::set_capabilities(Proto* proto, uintptr_t* capabilities)
+    void task_scheduler_t::set_capabilities(Proto * proto, uintptr_t * capabilities)
     {
         proto->userdata = capabilities;
         for (int i = 0; i < proto->sizep; ++i)
             task_scheduler_t::set_capabilities(proto->p[i], capabilities);
     }
 
-    void task_scheduler_t::set_capabilities(lua_State* state, int level, uintptr_t capabilities)
+    void task_scheduler_t::set_capabilities(lua_State * state, int level, uintptr_t capabilities)
     {
         if (!state || !state->userdata)
             return;
 
         state->userdata->identity = level;
         state->userdata->capabilities = capabilities;
+    }
 }
