@@ -24,7 +24,7 @@ namespace module::rbx
 {
     using yielded_t = std::function<int(lua_State*)>;
 
-    struct g_yielder_t
+    struct yielder_t
     {
         std::queue<std::function<void()>> queue;
         std::mutex mutex;
@@ -33,5 +33,5 @@ namespace module::rbx
         int yield_execution(lua_State* L, const std::function<yielded_t()>& closure);
     };
 
-    inline g_yielder_t yielder{};
+    inline yielder_t yielder{};
 }
