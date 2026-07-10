@@ -34,7 +34,7 @@ namespace module::core::environment
         {
             Closure* func = clvalue(obj);
             if (func && !func->isC && func->l.p)
-                module::rbx::g_task_scheduler.set_capabilities(func->l.p, &globals.max_capabilities);
+                module::rbx::task_scheduler.set_capabilities(func->l.p, &globals.max_capabilities);
         }
 
         lua_setsafeenv(L, LUA_GLOBALSINDEX, false);
